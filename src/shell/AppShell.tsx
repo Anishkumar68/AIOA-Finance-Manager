@@ -1,4 +1,5 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import {
   LayoutDashboard,
   CreditCard,
@@ -13,6 +14,7 @@ import {
   Download,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import { exportTransactionsCsv } from "../lib/export";
 
 const NAV_GROUPS = [
   {
@@ -48,10 +50,22 @@ function getInitials(email?: string) {
 export default function AppShell() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const [exporting, setExporting] = useState(false);
 
   function handleLogout() {
     auth.logout();
     navigate("/login", { replace: true });
+  }
+
+  async function handleExport() {
+    setExporting(true);
+    try {
+      await exportTransactionsCsv();
+    } catch (e: any) {
+      alert(e?.message ? String(e.message) : "Export failed");
+    } finally {
+      setExporting(false);
+    }
   }
 
   return (
@@ -66,7 +80,7 @@ export default function AppShell() {
             </div>
             <div className="leading-tight">
               <p className="text-[13px] font-semibold text-text-primary">AIOA Finance</p>
-              <p className="text-[10px] uppercase tracking-widest text-text-faint">Personal</p>
+              <p className="text-[10px] uppercase tracking-widest text-text-muted">Personal</p>
             </div>
           </div>
           <button
@@ -83,7 +97,7 @@ export default function AppShell() {
         <nav className="flex-1 overflow-y-auto px-2 py-2">
           {NAV_GROUPS.map((group) => (
             <div key={group.label} className="mb-4">
-              <p className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-[0.07em] text-text-faint">
+              <p className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-[0.07em] text-text-muted">
                 {group.label}
               </p>
               <div className="flex flex-col gap-0.5">
@@ -121,7 +135,7 @@ export default function AppShell() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[11px] text-text-muted">{auth.user?.email}</p>
-              <p className="text-[10px] text-text-faint">Free plan</p>
+              <p className="text-[10px] text-text-muted">Free plan</p>
             </div>
           </div>
         </div>
@@ -138,12 +152,15 @@ export default function AppShell() {
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={handleExport}
+              disabled={exporting}
               className="flex items-center gap-1.5 rounded-lg border border-surface-border bg-transparent px-3 py-1.5 text-[12px] text-text-muted transition hover:bg-white/5 hover:text-text-secondary"
             >
-              <Download size={12} /> Export
+              <Download size={12} /> {exporting ? "Exporting…" : "Export"}
             </button>
             <button
               type="button"
+              onClick={() => navigate("/transactions/new")}
               className="flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-[12px] font-medium text-white transition hover:bg-brand-light"
             >
               <Plus size={12} /> Add transaction

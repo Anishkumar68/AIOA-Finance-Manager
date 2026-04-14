@@ -13,7 +13,7 @@ export default function AccountsPage() {
 
   const [name, setName] = useState("");
   const [type, setType] = useState("cash");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("INR");
   const [opening, setOpening] = useState("0");
   const [busy, setBusy] = useState(false);
 
@@ -46,7 +46,7 @@ export default function AccountsPage() {
     if (!editing) return;
     setEditName(editing.name ?? "");
     setEditType(editing.type ?? "cash");
-    setEditCurrency(editing.currency ?? "USD");
+    setEditCurrency(editing.currency ?? "INR");
     setEditActive(!!editing.is_active);
   }, [editing]);
 
@@ -58,7 +58,7 @@ export default function AccountsPage() {
       await createAccount({
         name: name.trim(),
         type,
-        currency: currency.trim() || "USD",
+        currency: currency.trim() || "INR",
         opening_balance: Number(opening || 0)
       });
       setName("");
@@ -80,7 +80,7 @@ export default function AccountsPage() {
       await updateAccount(editingId, {
         name: editName.trim(),
         type: editType,
-        currency: editCurrency.trim() || "USD",
+        currency: editCurrency.trim() || "INR",
         is_active: editActive
       });
       setEditingId(null);
@@ -143,7 +143,7 @@ export default function AccountsPage() {
             </Select>
           </Field>
           <Field label="Currency">
-            <Input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder="USD" />
+            <Input value={currency} onChange={(e) => setCurrency(e.target.value)} placeholder="INR" />
           </Field>
           <Field label="Opening balance">
             <Input inputMode="decimal" value={opening} onChange={(e) => setOpening(e.target.value)} />

@@ -19,8 +19,8 @@ export default {
 				text: {
 					primary: "#e2e8f7",
 					secondary: "#94a3b8",
-					muted: "#64748b",
-					faint: "#3d5070",
+					muted: "#7c8ba7",
+					faint: "#5a6f8a",
 				},
 				success: "#34d399",
 				danger: "#f87171",
