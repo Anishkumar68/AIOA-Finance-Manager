@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Subtle app defaults (keeps layout calm and readable). */
+html,
+body {
+  height: 100%;
+}
+
