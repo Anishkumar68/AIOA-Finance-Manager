@@ -104,6 +104,7 @@ export type Transaction = {
   note?: string | null;
   reference?: string | null;
   transfer_account_id?: number | null;
+  tags?: { id: number; name: string; color?: string | null }[];
 };
 
 export type Paginated<TItem> = {
@@ -112,6 +113,22 @@ export type Paginated<TItem> = {
   page: number;
   limit: number;
   pages: number;
+};
+
+export type TransactionImportRowError = {
+  row_number: number;
+  message: string;
+  raw: Record<string, string | null | undefined>;
+};
+
+export type TransactionImportResponse = {
+  total_rows: number;
+  imported: number;
+  failed: number;
+  skipped: number;
+  dry_run: boolean;
+  mode: string;
+  errors: TransactionImportRowError[];
 };
 
 export type DashboardSummary = {
@@ -201,6 +218,7 @@ export async function getTransactions(filters: {
   category_id?: number;
   type?: string;
   search?: string;
+  tag_id?: number;
   page?: number;
   limit?: number;
 }) {
@@ -221,6 +239,84 @@ export async function updateTransaction(id: number, body: Partial<Omit<Transacti
 
 export async function deleteTransaction(id: number) {
   return request<void>(`/api/v1/transactions/${id}`, { method: "DELETE" });
+}
+
+export function exportTransactionsUrl(filters: {
+  from_date?: string;
+  to_date?: string;
+  account_id?: number;
+  category_id?: number;
+  type?: string;
+  search?: string;
+}) {
+  const params = new URLSearchParams();
+  if (filters.from_date) params.set("from_date", filters.from_date);
+  if (filters.to_date) params.set("to_date", filters.to_date);
+  if (filters.account_id) params.set("account_id", String(filters.account_id));
+  if (filters.category_id) params.set("category_id", String(filters.category_id));
+  if (filters.type) params.set("type", filters.type);
+  if (filters.search) params.set("search", filters.search);
+
+  const API_BASE =
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+    (import.meta.env.DEV ? "http://localhost:8000" : "");
+
+  const qs = params.toString();
+  return `${API_BASE}/api/v1/transactions/export${qs ? `?${qs}` : ""}`;
+}
+
+export function importTransactionsTemplateUrl() {
+  const API_BASE =
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+    (import.meta.env.DEV ? "http://localhost:8000" : "");
+  return `${API_BASE}/api/v1/transactions/import-template`;
+}
+
+export async function importTransactionsCsv(
+  file: File,
+  options: { mode?: "partial" | "all_or_nothing"; dry_run?: boolean } = {}
+) {
+  const API_BASE =
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+    (import.meta.env.DEV ? "http://localhost:8000" : "");
+
+  const params = new URLSearchParams();
+  if (options.mode) params.set("mode", options.mode);
+  if (options.dry_run) params.set("dry_run", "true");
+
+  const url = `${API_BASE}/api/v1/transactions/import${params.toString() ? `?${params.toString()}` : ""}`;
+  const tokens = getTokens();
+
+  const form = new FormData();
+  form.append("file", file);
+
+  async function doFetch() {
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        ...(tokens ? { Authorization: `Bearer ${tokens.accessToken}` } : {})
+      },
+      body: form
+    });
+  }
+
+  let res = await doFetch();
+  if (res.status === 401) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      const nextTokens = getTokens();
+      res = await fetch(url, {
+        method: "POST",
+        headers: {
+          ...(nextTokens ? { Authorization: `Bearer ${nextTokens.accessToken}` } : {})
+        },
+        body: form
+      });
+    }
+  }
+
+  if (!res.ok) throw await parseError(res);
+  return (await res.json()) as TransactionImportResponse;
 }
 
 export async function getDashboardSummary() {
@@ -364,4 +460,88 @@ export async function addLoanEntry(loanId: number, body: { kind: "disbursement" 
 
 export async function deleteLoanEntry(loanId: number, entryId: number) {
   return request<void>(`/api/v1/loans/${loanId}/entries/${entryId}`, { method: "DELETE" });
+}
+
+// Recurring Transactions
+export type RecurringTransaction = {
+  id: number;
+  user_id: number;
+  account_id: number;
+  category_id?: number | null;
+  type: "income" | "expense" | "transfer";
+  amount: string | number;
+  frequency: "daily" | "weekly" | "monthly" | "yearly";
+  interval: number;
+  start_date: string;
+  end_date?: string | null;
+  next_occurrence: string;
+  note?: string | null;
+  reference?: string | null;
+  transfer_account_id?: number | null;
+  is_active: boolean;
+  last_processed?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export async function getRecurringTransactions(includeInactive = false) {
+  return request<{ items: RecurringTransaction[]; total: number }>("/api/v1/recurring/", {
+    query: { include_inactive: includeInactive }
+  });
+}
+
+export async function createRecurringTransaction(body: {
+  account_id: number;
+  category_id?: number;
+  type: "income" | "expense" | "transfer";
+  amount: number;
+  frequency: "daily" | "weekly" | "monthly" | "yearly";
+  interval?: number;
+  start_date: string;
+  end_date?: string;
+  note?: string;
+  reference?: string;
+  transfer_account_id?: number;
+}) {
+  return request<RecurringTransaction>("/api/v1/recurring/", { method: "POST", body });
+}
+
+export async function updateRecurringTransaction(id: number, body: Partial<Omit<RecurringTransaction, "id" | "user_id">>) {
+  return request<RecurringTransaction>(`/api/v1/recurring/${id}`, { method: "PUT", body });
+}
+
+export async function deleteRecurringTransaction(id: number) {
+  return request<void>(`/api/v1/recurring/${id}`, { method: "DELETE" });
+}
+
+export async function processRecurringTransactions() {
+  return request<{ message: string; created_count: number }>("/api/v1/recurring/process", { method: "POST" });
+}
+
+// Tags
+export type Tag = {
+  id: number;
+  user_id: number;
+  name: string;
+  color?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export async function getTags(search?: string) {
+  return request<{ items: Tag[]; total: number }>("/api/v1/tags/", {
+    query: search ? { search } : {}
+  });
+}
+
+export async function createTag(body: { name: string; color?: string }) {
+  return request<Tag>("/api/v1/tags/", { method: "POST", body });
+}
+
+export async function updateTag(id: number, body: { name?: string; color?: string }) {
+  return request<Tag>(`/api/v1/tags/${id}`, { method: "PUT", body });
+}
+
+export async function deleteTag(id: number) {
+  return request<void>(`/api/v1/tags/${id}`, { method: "DELETE" });
 }

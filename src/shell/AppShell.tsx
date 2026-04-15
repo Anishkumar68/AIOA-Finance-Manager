@@ -5,6 +5,7 @@ import {
   CreditCard,
   Tag,
   ArrowLeftRight,
+  Repeat,
   HandCoins,
   Target,
   BarChart2,
@@ -29,6 +30,7 @@ const NAV_GROUPS = [
     label: "Money",
     items: [
       { to: "/transactions", label: "Transactions", icon: ArrowLeftRight },
+      { to: "/recurring",    label: "Recurring",     icon: Repeat },
       { to: "/udhar",        label: "Udhar Khata",  icon: HandCoins },
       { to: "/budgets",      label: "Budgets",      icon: Target },
       { to: "/reports",      label: "Reports",      icon: BarChart2 },

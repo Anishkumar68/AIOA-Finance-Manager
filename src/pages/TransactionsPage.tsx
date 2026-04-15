@@ -1,7 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
-import { deleteTransaction, getAccounts, getCategories, getTransactions } from "../lib/api";
+import {
+  deleteTransaction,
+  exportTransactionsUrl,
+  getAccounts,
+  getCategories,
+  getTags,
+  getTransactions,
+  importTransactionsCsv,
+  importTransactionsTemplateUrl,
+  TransactionImportResponse
+} from "../lib/api";
 import { formatAmount } from "../lib/format";
 
 export default function TransactionsPage() {
@@ -20,6 +30,12 @@ export default function TransactionsPage() {
   const [categoryId, setCategoryId] = useState<string>("");
   const [type, setType] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [tagId, setTagId] = useState<string>("");
+  const [allTags, setAllTags] = useState<any[]>([]);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<TransactionImportResponse | null>(null);
 
   const accountById = useMemo(() => new Map(accounts.map((a) => [a.id, a])), [accounts]);
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
@@ -28,10 +44,11 @@ export default function TransactionsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const [a, c] = await Promise.all([getAccounts(true), getCategories(undefined, true)]);
+        const [a, c, t] = await Promise.all([getAccounts(true), getCategories(undefined, true), getTags()]);
         if (cancelled) return;
         setAccounts(a);
         setCategories(c);
+        setAllTags(t.items);
       } catch {
         // non-fatal; page still works with ids
       }
@@ -52,6 +69,7 @@ export default function TransactionsPage() {
         category_id: categoryId ? Number(categoryId) : undefined,
         type: type || undefined,
         search: search || undefined,
+        tag_id: tagId ? Number(tagId) : undefined,
         page: nextPage,
         limit: 20
       });
@@ -74,7 +92,7 @@ export default function TransactionsPage() {
   useEffect(() => {
     load(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromDate, toDate, accountId, categoryId, type, search]);
+  }, [fromDate, toDate, accountId, categoryId, type, search, tagId]);
 
   async function onDelete(id: number) {
     if (!confirm("Delete this transaction?")) return;
@@ -87,19 +105,137 @@ export default function TransactionsPage() {
     }
   }
 
+  function handleExport() {
+    const url = exportTransactionsUrl({
+      from_date: fromDate || undefined,
+      to_date: toDate || undefined,
+      account_id: accountId ? Number(accountId) : undefined,
+      category_id: categoryId ? Number(categoryId) : undefined,
+      type: type || undefined,
+      search: search || undefined
+    });
+
+    // Get auth token
+    const tokens = JSON.parse(localStorage.getItem("auth_tokens") || "{}");
+    const headers: HeadersInit = {};
+    if (tokens.accessToken) {
+      headers["Authorization"] = `Bearer ${tokens.accessToken}`;
+    }
+
+    fetch(url, { headers })
+      .then((res) => {
+        if (!res.ok) throw new Error("Export failed");
+        return res.blob();
+      })
+      .then((blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = "transactions.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(downloadUrl);
+      })
+      .catch((err) => {
+        setError("Failed to export transactions");
+        console.error("Export error:", err);
+      });
+  }
+
+  function handleImportClick() {
+    setImportResult(null);
+    fileInputRef.current?.click();
+  }
+
+  async function handleImportFile(file: File) {
+    setImporting(true);
+    setError(null);
+    try {
+      const res = await importTransactionsCsv(file, { mode: "partial" });
+      setImportResult(res);
+      if (res.imported > 0) await load(1);
+    } catch (e: any) {
+      setError(e?.message ? String(e.message) : "Failed to import transactions");
+    } finally {
+      setImporting(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <SectionTitle
         title="Transactions"
         subtitle="Filter, search, add, edit, and delete."
         right={
-          <Link to="/transactions/new">
-            <Button type="button">Add transaction</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) handleImportFile(f);
+              }}
+            />
+            <Button variant="ghost" type="button" onClick={() => window.open(importTransactionsTemplateUrl(), "_blank")}>
+              Template
+            </Button>
+            <Button variant="ghost" type="button" onClick={handleImportClick} disabled={importing}>
+              {importing ? "Importing…" : "Import CSV"}
+            </Button>
+            <Button variant="ghost" type="button" onClick={handleExport}>
+              Export CSV
+            </Button>
+            <Link to="/transactions/new">
+              <Button type="button">Add transaction</Button>
+            </Link>
+          </div>
         }
       />
 
       {error ? <InlineError message={error} /> : null}
+
+      {importResult ? (
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="text-sm font-semibold text-white">Import result</div>
+            <div className="text-xs text-slate-400">
+              {importResult.imported} imported · {importResult.failed} failed · {importResult.total_rows} rows
+            </div>
+          </div>
+          {importResult.errors?.length ? (
+            <div className="mt-3 text-sm text-slate-200">
+              <details>
+                <summary className="cursor-pointer text-slate-300">View errors ({importResult.errors.length})</summary>
+                <div className="mt-2 overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="text-slate-400">
+                      <tr className="border-b border-white/10">
+                        <th className="py-2 pr-3 font-medium">Row</th>
+                        <th className="py-2 pr-3 font-medium">Message</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importResult.errors.slice(0, 25).map((er, idx) => (
+                        <tr key={idx} className="border-b border-white/5 last:border-b-0">
+                          <td className="py-2 pr-3 tabular-nums">{er.row_number}</td>
+                          <td className="py-2 pr-3">{er.message}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {importResult.errors.length > 25 ? (
+                    <div className="mt-2 text-xs text-slate-400">Showing first 25 errors.</div>
+                  ) : null}
+                </div>
+              </details>
+            </div>
+          ) : null}
+        </Card>
+      ) : null}
 
       <Card>
         <div className="text-sm font-semibold text-white">Filters</div>
@@ -140,6 +276,16 @@ export default function TransactionsPage() {
               ))}
             </Select>
           </Field>
+          <Field label="Tag">
+            <Select value={tagId} onChange={(e) => setTagId(e.target.value)}>
+              <option value="">All</option>
+              {allTags.map((t) => (
+                <option key={t.id} value={String(t.id)}>
+                  #{t.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Search note">
             <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="e.g. grocery" />
           </Field>
@@ -160,7 +306,7 @@ export default function TransactionsPage() {
                 <th className="py-2 pr-3 font-medium">Type</th>
                 <th className="py-2 pr-3 font-medium">Account</th>
                 <th className="py-2 pr-3 font-medium">Category / Transfer</th>
-                <th className="py-2 pr-3 font-medium">Note</th>
+                <th className="py-2 pr-3 font-medium">Note / Tags</th>
                 <th className="py-2 text-right font-medium">Amount</th>
                 <th className="py-2 text-right font-medium">Actions</th>
               </tr>
@@ -181,7 +327,25 @@ export default function TransactionsPage() {
                     <td className="py-2 pr-3">{t.type}</td>
                     <td className="py-2 pr-3">{acc?.name ?? `#${t.account_id}`}</td>
                     <td className="py-2 pr-3">{detail}</td>
-                    <td className="py-2 pr-3">{t.note ?? "—"}</td>
+                    <td className="py-2 pr-3">
+                      <div>{t.note ?? "—"}</div>
+                      {t.tags && t.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {t.tags.map((tag: any) => (
+                            <span
+                              key={tag.id}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px]"
+                              style={{
+                                backgroundColor: tag.color ? `${tag.color}33` : "rgba(99,130,255,0.15)",
+                                color: tag.color || "#818cf8"
+                              }}
+                            >
+                              #{tag.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     <td className="py-2 text-right tabular-nums">{formatAmount(t.amount, currency)}</td>
                     <td className="py-2 text-right">
                       <div className="inline-flex items-center gap-2">
