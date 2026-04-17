@@ -97,12 +97,12 @@ export default function CategoriesPage() {
         subtitle="Income and expense categories."
         right={
           <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-slate-200">
+            <label className="flex items-center gap-2 text-sm text-text-secondary">
               <input
                 type="checkbox"
                 checked={includeInactive}
                 onChange={(e) => setIncludeInactive(e.target.checked)}
-                className="h-4 w-4 rounded border-white/20 bg-black/30"
+                className="h-4 w-4 rounded border-surface-border bg-surface-raised text-brand focus:ring-2 focus:ring-brand/20"
               />
               Show inactive
             </label>
@@ -118,7 +118,7 @@ export default function CategoriesPage() {
       {error ? <InlineError message={error} /> : null}
 
       <Card>
-        <div className="text-sm font-semibold text-white">New category</div>
+        <div className="text-sm font-semibold text-text-primary">New category</div>
         <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3" onSubmit={onCreate}>
           <Field label="Name">
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Food" />
@@ -140,7 +140,7 @@ export default function CategoriesPage() {
       {editing ? (
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">Edit category</div>
+            <div className="text-sm font-semibold text-text-primary">Edit category</div>
             <Button variant="ghost" type="button" onClick={() => setEditingId(null)}>
               Close
             </Button>
@@ -175,24 +175,24 @@ export default function CategoriesPage() {
 
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold text-white">Categories</div>
-          <div className="text-xs text-slate-400">{loading ? "Loading…" : `${items.length} total`}</div>
+          <div className="text-sm font-semibold text-text-primary">Categories</div>
+          <div className="text-xs text-text-muted">{loading ? "Loading…" : `${items.length} total`}</div>
         </div>
 
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs text-slate-400">
-              <tr className="border-b border-white/10">
+            <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+              <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Name</th>
                 <th className="py-2 pr-3 font-medium">Type</th>
                 <th className="py-2 pr-3 font-medium">Status</th>
                 <th className="py-2 text-right font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-slate-200">
+            <tbody className="text-text-secondary">
               {items.map((c) => (
-                <tr key={c.id} className="border-b border-white/5 last:border-b-0">
-                  <td className="py-2 pr-3">{c.name}</td>
+                <tr key={c.id} className="border-b border-surface-border/70 last:border-b-0 hover:bg-surface-raised/30">
+                  <td className="py-2 pr-3 text-text-primary">{c.name}</td>
                   <td className="py-2 pr-3">{c.type}</td>
                   <td className="py-2 pr-3">{c.is_active ? "active" : "inactive"}</td>
                   <td className="py-2 text-right">
@@ -209,7 +209,7 @@ export default function CategoriesPage() {
               ))}
               {!loading && items.length === 0 ? (
                 <tr>
-                  <td className="py-4 text-sm text-slate-400" colSpan={4}>
+                  <td className="py-6 text-sm text-text-muted" colSpan={4}>
                     No categories yet.
                   </td>
                 </tr>

@@ -7,7 +7,7 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
 
   if (auth.loading) {
     return (
-      <div className="grid min-h-screen place-items-center bg-ink-1 text-slate-300">
+      <div className="grid min-h-screen place-items-center bg-surface-base text-text-muted">
         <div className="text-sm">Loading…</div>
       </div>
     );
@@ -19,4 +19,3 @@ export default function RequireAuth({ children }: { children: React.ReactNode })
 
   return <>{children}</>;
 }
-

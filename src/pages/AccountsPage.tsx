@@ -113,12 +113,12 @@ export default function AccountsPage() {
         title="Accounts"
         subtitle="Create, edit, and archive accounts."
         right={
-          <label className="flex items-center gap-2 text-sm text-slate-200">
+          <label className="flex items-center gap-2 text-sm text-text-secondary">
             <input
               type="checkbox"
               checked={includeInactive}
               onChange={(e) => setIncludeInactive(e.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-black/30"
+              className="h-4 w-4 rounded border-surface-border bg-surface-raised text-brand focus:ring-2 focus:ring-brand/20"
             />
             Show archived
           </label>
@@ -128,7 +128,7 @@ export default function AccountsPage() {
       {error ? <InlineError message={error} /> : null}
 
       <Card>
-        <div className="text-sm font-semibold text-white">New account</div>
+        <div className="text-sm font-semibold text-text-primary">New account</div>
         <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-4" onSubmit={onCreate}>
           <Field label="Name">
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Wallet" />
@@ -159,7 +159,7 @@ export default function AccountsPage() {
       {editing ? (
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">Edit account</div>
+            <div className="text-sm font-semibold text-text-primary">Edit account</div>
             <Button variant="ghost" type="button" onClick={() => setEditingId(null)}>
               Close
             </Button>
@@ -200,14 +200,14 @@ export default function AccountsPage() {
 
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold text-white">Accounts</div>
-          <div className="text-xs text-slate-400">{loading ? "Loading…" : `${items.length} total`}</div>
+          <div className="text-sm font-semibold text-text-primary">Accounts</div>
+          <div className="text-xs text-text-muted">{loading ? "Loading…" : `${items.length} total`}</div>
         </div>
 
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs text-slate-400">
-              <tr className="border-b border-white/10">
+            <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+              <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Name</th>
                 <th className="py-2 pr-3 font-medium">Type</th>
                 <th className="py-2 pr-3 font-medium">Currency</th>
@@ -216,14 +216,14 @@ export default function AccountsPage() {
                 <th className="py-2 text-right font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-slate-200">
+            <tbody className="text-text-secondary">
               {items.map((a) => (
-                <tr key={a.id} className="border-b border-white/5 last:border-b-0">
-                  <td className="py-2 pr-3">{a.name}</td>
+                <tr key={a.id} className="border-b border-surface-border/70 last:border-b-0 hover:bg-surface-raised/30">
+                  <td className="py-2 pr-3 text-text-primary">{a.name}</td>
                   <td className="py-2 pr-3">{a.type}</td>
                   <td className="py-2 pr-3">{a.currency}</td>
                   <td className="py-2 pr-3">{a.is_active ? "active" : "archived"}</td>
-                  <td className="py-2 text-right tabular-nums">{formatAmount(a.current_balance, a.currency)}</td>
+                  <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(a.current_balance, a.currency)}</td>
                   <td className="py-2 text-right">
                     <div className="inline-flex items-center gap-2">
                       <Button variant="ghost" type="button" onClick={() => setEditingId(a.id)}>
@@ -238,7 +238,7 @@ export default function AccountsPage() {
               ))}
               {!loading && items.length === 0 ? (
                 <tr>
-                  <td className="py-4 text-sm text-slate-400" colSpan={6}>
+                  <td className="py-6 text-sm text-text-muted" colSpan={6}>
                     No accounts yet.
                   </td>
                 </tr>

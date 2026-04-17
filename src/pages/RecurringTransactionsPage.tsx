@@ -272,7 +272,7 @@ export default function RecurringTransactionsPage() {
               return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3 rounded border border-white/5 bg-white/5"
+                  className="flex items-center justify-between p-3 rounded-xl border border-surface-border bg-surface-raised/40"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">

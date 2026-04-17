@@ -51,49 +51,49 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">Monthly summary</div>
+            <div className="text-sm font-semibold text-text-primary">Monthly summary</div>
             <Button variant="ghost" type="button" disabled={loading} onClick={load}>
               Refresh
             </Button>
           </div>
-          <div className="mt-3 space-y-2 text-sm text-slate-200">
+          <div className="mt-3 space-y-2 text-sm text-text-secondary">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-slate-300">Income</div>
-              <div className="tabular-nums">{formatAmount(monthly?.total_income)}</div>
+              <div className="text-text-muted">Income</div>
+              <div className="tabular-nums text-text-primary">{formatAmount(monthly?.total_income)}</div>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <div className="text-slate-300">Expense</div>
-              <div className="tabular-nums">{formatAmount(monthly?.total_expense)}</div>
+              <div className="text-text-muted">Expense</div>
+              <div className="tabular-nums text-text-primary">{formatAmount(monthly?.total_expense)}</div>
             </div>
-            <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-2">
-              <div className="text-slate-300">Net savings</div>
-              <div className="tabular-nums">{formatAmount(monthly?.net_savings)}</div>
+            <div className="flex items-center justify-between gap-3 border-t border-surface-border pt-2">
+              <div className="text-text-muted">Net savings</div>
+              <div className="tabular-nums text-text-primary">{formatAmount(monthly?.net_savings)}</div>
             </div>
           </div>
         </Card>
 
         <Card>
-          <div className="text-sm font-semibold text-white">Category expense</div>
+          <div className="text-sm font-semibold text-text-primary">Category expense</div>
           <div className="mt-3 overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="text-xs text-slate-400">
-                <tr className="border-b border-white/10">
+              <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+                <tr className="border-b border-surface-border">
                   <th className="py-2 pr-3 font-medium">Category</th>
                   <th className="py-2 pr-3 font-medium">Count</th>
                   <th className="py-2 text-right font-medium">Total</th>
                 </tr>
               </thead>
-              <tbody className="text-slate-200">
+              <tbody className="text-text-secondary">
                 {(categoryReport?.categories ?? []).map((r: any) => (
-                  <tr key={r.category_id} className="border-b border-white/5 last:border-b-0">
-                    <td className="py-2 pr-3">{r.category_name}</td>
-                    <td className="py-2 pr-3 tabular-nums text-slate-300">{r.transaction_count}</td>
-                    <td className="py-2 text-right tabular-nums">{formatAmount(r.total_spent)}</td>
+                  <tr key={r.category_id} className="border-b border-surface-border/70 last:border-b-0 hover:bg-surface-raised/30">
+                    <td className="py-2 pr-3 text-text-primary">{r.category_name}</td>
+                    <td className="py-2 pr-3 tabular-nums text-text-muted">{r.transaction_count}</td>
+                    <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(r.total_spent)}</td>
                   </tr>
                 ))}
                 {!loading && (categoryReport?.categories ?? []).length === 0 ? (
                   <tr>
-                    <td className="py-4 text-sm text-slate-400" colSpan={3}>
+                    <td className="py-6 text-sm text-text-muted" colSpan={3}>
                       No expense categories found.
                     </td>
                   </tr>
@@ -105,11 +105,11 @@ export default function ReportsPage() {
       </div>
 
       <Card>
-        <div className="text-sm font-semibold text-white">Account balances</div>
+        <div className="text-sm font-semibold text-text-primary">Account balances</div>
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs text-slate-400">
-              <tr className="border-b border-white/10">
+            <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+              <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Account</th>
                 <th className="py-2 pr-3 font-medium">Type</th>
                 <th className="py-2 pr-3 font-medium">Status</th>
@@ -118,20 +118,20 @@ export default function ReportsPage() {
                 <th className="py-2 text-right font-medium">Current</th>
               </tr>
             </thead>
-            <tbody className="text-slate-200">
+            <tbody className="text-text-secondary">
               {(accountReport?.accounts ?? []).map((a: any) => (
-                <tr key={a.account_id} className="border-b border-white/5 last:border-b-0">
-                  <td className="py-2 pr-3">{a.account_name}</td>
+                <tr key={a.account_id} className="border-b border-surface-border/70 last:border-b-0 hover:bg-surface-raised/30">
+                  <td className="py-2 pr-3 text-text-primary">{a.account_name}</td>
                   <td className="py-2 pr-3">{a.account_type}</td>
                   <td className="py-2 pr-3">{a.is_active ? "active" : "archived"}</td>
-                  <td className="py-2 pr-3 tabular-nums text-slate-300">{a.transaction_count}</td>
-                  <td className="py-2 text-right tabular-nums">{formatAmount(a.opening_balance)}</td>
-                  <td className="py-2 text-right tabular-nums">{formatAmount(a.current_balance)}</td>
+                  <td className="py-2 pr-3 tabular-nums text-text-muted">{a.transaction_count}</td>
+                  <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(a.opening_balance)}</td>
+                  <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(a.current_balance)}</td>
                 </tr>
               ))}
               {!loading && (accountReport?.accounts ?? []).length === 0 ? (
                 <tr>
-                  <td className="py-4 text-sm text-slate-400" colSpan={6}>
+                  <td className="py-6 text-sm text-text-muted" colSpan={6}>
                     No accounts found.
                   </td>
                 </tr>
@@ -140,9 +140,9 @@ export default function ReportsPage() {
           </table>
         </div>
         {!loading && accountReport?.accounts ? (
-          <div className="mt-3 text-xs text-slate-400">
+          <div className="mt-3 text-xs text-text-muted">
             Total current:{" "}
-            <span className="tabular-nums text-slate-200">
+            <span className="tabular-nums text-text-secondary">
               {formatAmount((accountReport.accounts as any[]).reduce((s, a) => s + toNumber(a.current_balance), 0))}
             </span>
           </div>

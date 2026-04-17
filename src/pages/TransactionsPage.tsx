@@ -201,26 +201,26 @@ export default function TransactionsPage() {
       {importResult ? (
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="text-sm font-semibold text-white">Import result</div>
-            <div className="text-xs text-slate-400">
+            <div className="text-sm font-semibold text-text-primary">Import result</div>
+            <div className="text-xs text-text-muted">
               {importResult.imported} imported · {importResult.failed} failed · {importResult.total_rows} rows
             </div>
           </div>
           {importResult.errors?.length ? (
-            <div className="mt-3 text-sm text-slate-200">
+            <div className="mt-3 text-sm text-text-secondary">
               <details>
-                <summary className="cursor-pointer text-slate-300">View errors ({importResult.errors.length})</summary>
+                <summary className="cursor-pointer text-text-muted">View errors ({importResult.errors.length})</summary>
                 <div className="mt-2 overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="text-slate-400">
-                      <tr className="border-b border-white/10">
+                    <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+                      <tr className="border-b border-surface-border">
                         <th className="py-2 pr-3 font-medium">Row</th>
                         <th className="py-2 pr-3 font-medium">Message</th>
                       </tr>
                     </thead>
                     <tbody>
                       {importResult.errors.slice(0, 25).map((er, idx) => (
-                        <tr key={idx} className="border-b border-white/5 last:border-b-0">
+                        <tr key={idx} className="border-b border-surface-border/70 last:border-b-0">
                           <td className="py-2 pr-3 tabular-nums">{er.row_number}</td>
                           <td className="py-2 pr-3">{er.message}</td>
                         </tr>
@@ -228,7 +228,7 @@ export default function TransactionsPage() {
                     </tbody>
                   </table>
                   {importResult.errors.length > 25 ? (
-                    <div className="mt-2 text-xs text-slate-400">Showing first 25 errors.</div>
+                    <div className="mt-2 text-xs text-text-muted">Showing first 25 errors.</div>
                   ) : null}
                 </div>
               </details>
@@ -238,7 +238,7 @@ export default function TransactionsPage() {
       ) : null}
 
       <Card>
-        <div className="text-sm font-semibold text-white">Filters</div>
+        <div className="text-sm font-semibold text-text-primary">Filters</div>
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-6">
           <Field label="From">
             <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
@@ -294,14 +294,14 @@ export default function TransactionsPage() {
 
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold text-white">Results</div>
-          <div className="text-xs text-slate-400">{loading ? "Loading…" : `${total} total`}</div>
+          <div className="text-sm font-semibold text-text-primary">Results</div>
+          <div className="text-xs text-text-muted">{loading ? "Loading…" : `${total} total`}</div>
         </div>
 
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs text-slate-400">
-              <tr className="border-b border-white/10">
+            <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+              <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Date</th>
                 <th className="py-2 pr-3 font-medium">Type</th>
                 <th className="py-2 pr-3 font-medium">Account</th>
@@ -311,7 +311,7 @@ export default function TransactionsPage() {
                 <th className="py-2 text-right font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="text-slate-200">
+            <tbody className="text-text-secondary">
               {items.map((t) => {
                 const acc = accountById.get(t.account_id);
                 const cat = t.category_id ? categoryById.get(t.category_id) : null;
@@ -322,10 +322,10 @@ export default function TransactionsPage() {
                     ? `→ ${transferAcc?.name ?? `#${t.transfer_account_id}`}`
                     : cat?.name ?? (t.category_id ? `#${t.category_id}` : "—");
                 return (
-                  <tr key={t.id} className="border-b border-white/5 last:border-b-0">
-                    <td className="py-2 pr-3">{t.date}</td>
+                  <tr key={t.id} className="border-b border-surface-border/70 last:border-b-0 hover:bg-surface-raised/30">
+                    <td className="py-2 pr-3 text-text-muted">{t.date}</td>
                     <td className="py-2 pr-3">{t.type}</td>
-                    <td className="py-2 pr-3">{acc?.name ?? `#${t.account_id}`}</td>
+                    <td className="py-2 pr-3 text-text-primary">{acc?.name ?? `#${t.account_id}`}</td>
                     <td className="py-2 pr-3">{detail}</td>
                     <td className="py-2 pr-3">
                       <div>{t.note ?? "—"}</div>
@@ -336,9 +336,15 @@ export default function TransactionsPage() {
                               key={tag.id}
                               className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px]"
                               style={{
-                                backgroundColor: tag.color ? `${tag.color}33` : "rgba(99,130,255,0.15)",
-                                color: tag.color || "#818cf8"
+                                backgroundColor: tag.color ? `${tag.color}33` : undefined,
+                                color: tag.color || undefined,
                               }}
+                              {...(!tag.color
+                                ? {
+                                    className:
+                                      "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border border-brand/20 bg-brand/10 text-brand-muted",
+                                  }
+                                : {})}
                             >
                               #{tag.name}
                             </span>
@@ -346,7 +352,7 @@ export default function TransactionsPage() {
                         </div>
                       )}
                     </td>
-                    <td className="py-2 text-right tabular-nums">{formatAmount(t.amount, currency)}</td>
+                    <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(t.amount, currency)}</td>
                     <td className="py-2 text-right">
                       <div className="inline-flex items-center gap-2">
                         <Link to={`/transactions/${t.id}/edit`}>
@@ -364,7 +370,7 @@ export default function TransactionsPage() {
               })}
               {!loading && items.length === 0 ? (
                 <tr>
-                  <td className="py-4 text-sm text-slate-400" colSpan={7}>
+                  <td className="py-6 text-sm text-text-muted" colSpan={7}>
                     No matching transactions.
                   </td>
                 </tr>
@@ -374,7 +380,7 @@ export default function TransactionsPage() {
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-text-muted">
             Page {page} / {pages}
           </div>
           <div className="flex items-center gap-2">

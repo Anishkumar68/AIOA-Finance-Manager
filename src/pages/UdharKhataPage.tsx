@@ -240,21 +240,21 @@ export default function UdharKhataPage() {
       {error ? <InlineError message={error} /> : null}
 
       <Card>
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold text-white">New {direction === "lent" ? "lend" : "borrow"} record</div>
-          <div className="text-xs text-slate-400">
-            {loading ? "Loading…" : `${items.length} loans • Outstanding ${formatAmount(totals.outstanding, currency)}`}
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-text-primary">New {direction === "lent" ? "lend" : "borrow"} record</div>
+            <div className="text-xs text-text-muted">
+              {loading ? "Loading…" : `${items.length} loans • Outstanding ${formatAmount(totals.outstanding, currency)}`}
+            </div>
           </div>
-        </div>
 
         <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-6" onSubmit={onCreateLoan}>
-          <div className="md:col-span-6 flex flex-wrap items-center gap-3 text-sm text-slate-200">
+          <div className="md:col-span-6 flex flex-wrap items-center gap-3 text-sm text-text-secondary">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={useExistingContact}
                 onChange={(e) => setUseExistingContact(e.target.checked)}
-                className="h-4 w-4 rounded border-white/20 bg-black/30"
+                className="h-4 w-4 rounded border-surface-border bg-surface-raised text-brand focus:ring-2 focus:ring-brand/20"
               />
               Use existing contact
             </label>
@@ -340,12 +340,12 @@ export default function UdharKhataPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-[320px_1fr]">
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">Loans</div>
-            <div className="text-xs text-slate-400">{loading ? "Loading…" : `${items.length} total`}</div>
+            <div className="text-sm font-semibold text-text-primary">Loans</div>
+            <div className="text-xs text-text-muted">{loading ? "Loading…" : `${items.length} total`}</div>
           </div>
           <div className="mt-3 space-y-2">
             {items.length === 0 ? (
-              <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-300">
+              <div className="rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-2 text-sm text-text-muted">
                 No records yet.
               </div>
             ) : null}
@@ -358,17 +358,19 @@ export default function UdharKhataPage() {
                   onClick={() => setSelectedId(x.id)}
                   className={[
                     "w-full rounded-xl border px-3 py-2 text-left transition",
-                    active ? "border-white/20 bg-white/10" : "border-white/10 bg-white/5 hover:bg-white/10"
+                    active
+                      ? "border-brand/25 bg-brand/10"
+                      : "border-surface-border bg-surface-raised/40 hover:bg-surface-raised/55"
                   ].join(" ")}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-semibold text-white">{x.contact_name}</div>
-                    <div className="text-xs text-slate-300">{x.status}</div>
+                    <div className="text-sm font-semibold text-text-primary">{x.contact_name}</div>
+                    <div className="text-xs text-text-muted">{x.status}</div>
                   </div>
-                  <div className="mt-1 text-xs text-slate-300">{x.title ? x.title : "—"}</div>
+                  <div className="mt-1 text-xs text-text-muted">{x.title ? x.title : "—"}</div>
                   <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                    <div className="text-slate-400">Outstanding</div>
-                    <div className="font-semibold text-slate-100">{formatAmount(x.outstanding, x.currency)}</div>
+                    <div className="text-text-muted">Outstanding</div>
+                    <div className="font-semibold text-text-primary">{formatAmount(x.outstanding, x.currency)}</div>
                   </div>
                 </button>
               );
@@ -378,20 +380,20 @@ export default function UdharKhataPage() {
 
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">Details</div>
-            <div className="text-xs text-slate-400">{selectedFromList ? `#${selectedFromList.id}` : "Select a loan"}</div>
+            <div className="text-sm font-semibold text-text-primary">Details</div>
+            <div className="text-xs text-text-muted">{selectedFromList ? `#${selectedFromList.id}` : "Select a loan"}</div>
           </div>
 
           {!selected ? (
-            <div className="mt-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-slate-300">
+            <div className="mt-3 rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-3 text-sm text-text-muted">
               Pick a loan from the left to see details and add recoveries/payments.
             </div>
           ) : (
             <div className="mt-3 space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <div className="text-sm font-semibold text-white">{selected.contact_name}</div>
-                  <div className="mt-0.5 text-xs text-slate-400">{selected.title ? selected.title : "—"}</div>
+                  <div className="text-sm font-semibold text-text-primary">{selected.contact_name}</div>
+                  <div className="mt-0.5 text-xs text-text-muted">{selected.title ? selected.title : "—"}</div>
                 </div>
                 <Button type="button" variant="danger" disabled={busy} onClick={onDeleteLoan}>
                   Delete loan
@@ -399,24 +401,24 @@ export default function UdharKhataPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                  <div className="text-xs text-slate-400">{disbursementLabel(direction)}</div>
-                  <div className="text-sm font-semibold text-white">{formatAmount(selected.total_disbursed, selected.currency)}</div>
+                <div className="rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-2">
+                  <div className="text-xs text-text-muted">{disbursementLabel(direction)}</div>
+                  <div className="text-sm font-semibold text-text-primary">{formatAmount(selected.total_disbursed, selected.currency)}</div>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                  <div className="text-xs text-slate-400">{repaymentLabel(direction)}</div>
-                  <div className="text-sm font-semibold text-white">{formatAmount(selected.total_repaid, selected.currency)}</div>
+                <div className="rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-2">
+                  <div className="text-xs text-text-muted">{repaymentLabel(direction)}</div>
+                  <div className="text-sm font-semibold text-text-primary">{formatAmount(selected.total_repaid, selected.currency)}</div>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                  <div className="text-xs text-slate-400">Outstanding</div>
-                  <div className="text-sm font-semibold text-white">{formatAmount(selected.outstanding, selected.currency)}</div>
+                <div className="rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-2">
+                  <div className="text-xs text-text-muted">Outstanding</div>
+                  <div className="text-sm font-semibold text-text-primary">{formatAmount(selected.outstanding, selected.currency)}</div>
                 </div>
               </div>
 
               <Divider />
 
               <div>
-                <div className="text-sm font-semibold text-white">Add entry</div>
+                <div className="text-sm font-semibold text-text-primary">Add entry</div>
                 <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-6" onSubmit={onAddEntry}>
                   <div className="md:col-span-2">
                     <Field label="Type">
@@ -453,24 +455,24 @@ export default function UdharKhataPage() {
 
               <div>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-semibold text-white">Timeline</div>
-                  <div className="text-xs text-slate-400">{selected.entries?.length ? `${selected.entries.length} entries` : "—"}</div>
+                  <div className="text-sm font-semibold text-text-primary">Timeline</div>
+                  <div className="text-xs text-text-muted">{selected.entries?.length ? `${selected.entries.length} entries` : "—"}</div>
                 </div>
 
                 <div className="mt-3 space-y-2">
                   {(selected.entries ?? []).map((e) => (
-                    <div key={e.id} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <div key={e.id} className="rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-2">
                       <div className="flex items-center justify-between gap-2">
                         <div>
-                          <div className="text-sm font-semibold text-white">
+                          <div className="text-sm font-semibold text-text-primary">
                             {e.kind === "disbursement" ? disbursementLabel(direction) : repaymentLabel(direction)}
                           </div>
-                          <div className="mt-1 text-xs text-slate-400">
+                          <div className="mt-1 text-xs text-text-muted">
                             {new Date(e.occurred_at).toLocaleString()} {e.note ? `• ${e.note}` : ""} • #{e.id}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="text-sm font-semibold text-slate-100">{formatAmount(e.amount, selected.currency)}</div>
+                          <div className="text-sm font-semibold text-text-primary">{formatAmount(e.amount, selected.currency)}</div>
                           <Button type="button" variant="ghost" disabled={busy} onClick={() => onDeleteEntry(e.id)}>
                             Delete
                           </Button>

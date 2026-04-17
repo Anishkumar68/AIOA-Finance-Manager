@@ -106,7 +106,7 @@ export default function BudgetsPage() {
       {error ? <InlineError message={error} /> : null}
 
       <Card>
-        <div className="text-sm font-semibold text-white">Set budget</div>
+        <div className="text-sm font-semibold text-text-primary">Set budget</div>
         <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3" onSubmit={onCreate}>
           <Field label="Category">
             <Select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
@@ -132,7 +132,7 @@ export default function BudgetsPage() {
       {editing ? (
         <Card>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-white">Edit budget</div>
+            <div className="text-sm font-semibold text-text-primary">Edit budget</div>
             <Button variant="ghost" type="button" onClick={() => setEditingId(null)}>
               Close
             </Button>
@@ -158,8 +158,8 @@ export default function BudgetsPage() {
 
       <Card>
         <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold text-white">This month</div>
-          <div className="text-xs text-slate-400">{loading ? "Loading…" : `${items.length} budgets`}</div>
+          <div className="text-sm font-semibold text-text-primary">This month</div>
+          <div className="text-xs text-text-muted">{loading ? "Loading…" : `${items.length} budgets`}</div>
         </div>
 
         <div className="mt-3 space-y-3">
@@ -168,18 +168,18 @@ export default function BudgetsPage() {
             const spent = toNumber(b.spent_amount);
             const pct = limit > 0 ? Math.max(0, Math.min(100, (spent / limit) * 100)) : 0;
             return (
-              <div key={b.budget_id} className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <div key={b.budget_id} className="rounded-xl border border-surface-border bg-surface-raised/40 p-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-sm font-semibold text-slate-100">{b.category_name}</div>
-                  <div className="text-sm tabular-nums text-slate-200">
+                  <div className="text-sm font-semibold text-text-primary">{b.category_name}</div>
+                  <div className="text-sm tabular-nums text-text-secondary">
                     {formatAmount(spent)} / {formatAmount(limit)}
                     {b.overspent ? <span className="ml-2 text-xs text-rose-200">overspent</span> : null}
                   </div>
                 </div>
-                <div className="mt-2 h-2 w-full rounded-full bg-white/5">
-                  <div className={`h-2 rounded-full ${b.overspent ? "bg-rose-400/40" : "bg-white/20"}`} style={{ width: `${pct}%` }} />
+                <div className="mt-2 h-2 w-full rounded-full bg-surface-raised">
+                  <div className={`h-2 rounded-full ${b.overspent ? "bg-rose-400/40" : "bg-brand/35"}`} style={{ width: `${pct}%` }} />
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-3 text-xs text-slate-400">
+                <div className="mt-2 flex items-center justify-between gap-3 text-xs text-text-muted">
                   <div>Remaining: {formatAmount(b.remaining_amount)}</div>
                   <Button variant="ghost" type="button" onClick={() => setEditingId(b.budget_id)}>
                     Edit
@@ -188,7 +188,7 @@ export default function BudgetsPage() {
               </div>
             );
           })}
-          {!loading && items.length === 0 ? <div className="text-sm text-slate-400">No budgets for this month.</div> : null}
+          {!loading && items.length === 0 ? <div className="text-sm text-text-muted">No budgets for this month.</div> : null}
         </div>
       </Card>
     </div>

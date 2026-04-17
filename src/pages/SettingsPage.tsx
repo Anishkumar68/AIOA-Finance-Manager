@@ -11,19 +11,19 @@ export default function SettingsPage() {
       <SectionTitle title="Settings" subtitle="Basic account settings and session control." />
 
       <Card>
-        <div className="text-sm font-semibold text-white">Account</div>
-        <div className="mt-3 space-y-2 text-sm text-slate-200">
+        <div className="text-sm font-semibold text-text-primary">Account</div>
+        <div className="mt-3 space-y-2 text-sm text-text-secondary">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-slate-300">Name</div>
-            <div>{auth.user?.name}</div>
+            <div className="text-text-muted">Name</div>
+            <div className="text-text-primary">{auth.user?.name}</div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-slate-300">Email</div>
-            <div>{auth.user?.email}</div>
+            <div className="text-text-muted">Email</div>
+            <div className="text-text-primary">{auth.user?.email}</div>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-slate-300">Status</div>
-            <div>{auth.user?.is_active ? "active" : "inactive"}</div>
+            <div className="text-text-muted">Status</div>
+            <div className="text-text-primary">{auth.user?.is_active ? "active" : "inactive"}</div>
           </div>
         </div>
 

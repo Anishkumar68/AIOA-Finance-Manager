@@ -249,10 +249,10 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
               {selectedTags.map((tag) => (
                 <span
                   key={tag.id}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs border border-brand/20 bg-brand/10 text-brand-muted"
                   style={{
-                    backgroundColor: tag.color ? `${tag.color}33` : "rgba(99,130,255,0.15)",
-                    color: tag.color || "#818cf8"
+                    backgroundColor: tag.color ? `${tag.color}33` : undefined,
+                    color: tag.color || undefined,
                   }}
                 >
                   #{tag.name}
@@ -274,7 +274,7 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
                   key={tag.id}
                   type="button"
                   onClick={() => toggleTag(tag.id)}
-                  className="px-2 py-0.5 rounded text-xs border border-white/10 hover:border-brand-muted transition-colors text-text-muted hover:text-text-primary"
+                  className="px-2 py-0.5 rounded text-xs border border-surface-border hover:border-brand/30 transition-colors text-text-muted hover:text-text-primary"
                 >
                   #{tag.name}
                 </button>
@@ -332,7 +332,7 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
             )}
           </div>
 
-          <div className="md:col-span-2 my-1 h-px w-full bg-white/10" />
+          <div className="md:col-span-2 my-1 h-px w-full bg-surface-border" />
 
           <div className="md:col-span-2 flex flex-wrap gap-2">
             <Button type="submit" disabled={loading || busy || !canSubmit}>
