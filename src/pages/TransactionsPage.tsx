@@ -334,17 +334,16 @@ export default function TransactionsPage() {
                           {t.tags.map((tag: any) => (
                             <span
                               key={tag.id}
-                              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px]"
-                              style={{
-                                backgroundColor: tag.color ? `${tag.color}33` : undefined,
-                                color: tag.color || undefined,
-                              }}
-                              {...(!tag.color
-                                ? {
-                                    className:
-                                      "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border border-brand/20 bg-brand/10 text-brand-muted",
-                                  }
-                                : {})}
+                              className={
+                                tag.color
+                                  ? "inline-flex items-center px-1.5 py-0.5 rounded text-[10px]"
+                                  : "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] border border-brand/20 bg-brand/10 text-brand-muted"
+                              }
+                              style={
+                                tag.color
+                                  ? { backgroundColor: `${tag.color}33`, color: tag.color }
+                                  : undefined
+                              }
                             >
                               #{tag.name}
                             </span>

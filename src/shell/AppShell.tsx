@@ -95,7 +95,7 @@ export default function AppShell() {
   }, [location.pathname]);
 
   return (
-    <div className="relative flex h-dvh w-full overflow-hidden bg-surface-base">
+    <div className="relative flex h-screen w-screen overflow-hidden bg-surface-base">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand/12 via-transparent to-transparent" />
       <div className="pointer-events-none absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-brand/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-52 -right-40 h-[560px] w-[560px] rounded-full bg-brand-muted/8 blur-3xl" />
