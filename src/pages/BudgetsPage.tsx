@@ -93,15 +93,15 @@ export default function BudgetsPage() {
 
   return (
     <div className="space-y-5">
-      <SectionTitle
-        title="Budgets"
-        subtitle="Simple monthly budgets by category."
-        right={
-          <Field label="Month">
-            <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-44" />
-          </Field>
-        }
-      />
+        <SectionTitle
+          title="Budgets"
+          subtitle="Simple monthly budgets by category."
+          right={
+            <Field label="Month">
+              <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-full sm:w-44" />
+            </Field>
+          }
+        />
 
       {error ? <InlineError message={error} /> : null}
 

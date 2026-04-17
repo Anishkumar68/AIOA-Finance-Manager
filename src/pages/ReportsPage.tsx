@@ -36,15 +36,15 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-5">
-      <SectionTitle
-        title="Reports"
-        subtitle="Monthly summary, category expense, and account balances."
-        right={
-          <Field label="Month">
-            <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-44" />
-          </Field>
-        }
-      />
+        <SectionTitle
+          title="Reports"
+          subtitle="Monthly summary, category expense, and account balances."
+          right={
+            <Field label="Month">
+              <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="w-full sm:w-44" />
+            </Field>
+          }
+        />
 
       {error ? <InlineError message={error} /> : null}
 
@@ -107,13 +107,13 @@ export default function ReportsPage() {
       <Card>
         <div className="text-sm font-semibold text-text-primary">Account balances</div>
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
               <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Account</th>
-                <th className="py-2 pr-3 font-medium">Type</th>
-                <th className="py-2 pr-3 font-medium">Status</th>
-                <th className="py-2 pr-3 font-medium">Txns</th>
+                <th className="py-2 pr-3 font-medium hidden sm:table-cell">Type</th>
+                <th className="py-2 pr-3 font-medium hidden sm:table-cell">Status</th>
+                <th className="py-2 pr-3 font-medium hidden md:table-cell">Txns</th>
                 <th className="py-2 text-right font-medium">Opening</th>
                 <th className="py-2 text-right font-medium">Current</th>
               </tr>
@@ -122,9 +122,9 @@ export default function ReportsPage() {
               {(accountReport?.accounts ?? []).map((a: any) => (
                 <tr key={a.account_id} className="border-b border-surface-border/70 last:border-b-0 hover:bg-surface-raised/30">
                   <td className="py-2 pr-3 text-text-primary">{a.account_name}</td>
-                  <td className="py-2 pr-3">{a.account_type}</td>
-                  <td className="py-2 pr-3">{a.is_active ? "active" : "archived"}</td>
-                  <td className="py-2 pr-3 tabular-nums text-text-muted">{a.transaction_count}</td>
+                  <td className="py-2 pr-3 hidden sm:table-cell">{a.account_type}</td>
+                  <td className="py-2 pr-3 hidden sm:table-cell">{a.is_active ? "active" : "archived"}</td>
+                  <td className="py-2 pr-3 tabular-nums text-text-muted hidden md:table-cell">{a.transaction_count}</td>
                   <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(a.opening_balance)}</td>
                   <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(a.current_balance)}</td>
                 </tr>

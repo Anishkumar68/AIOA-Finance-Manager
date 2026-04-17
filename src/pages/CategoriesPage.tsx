@@ -95,8 +95,8 @@ export default function CategoriesPage() {
       <SectionTitle
         title="Categories"
         subtitle="Income and expense categories."
-        right={
-          <div className="flex flex-wrap items-center gap-3">
+          right={
+            <div className="flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-sm text-text-secondary">
               <input
                 type="checkbox"
@@ -106,14 +106,14 @@ export default function CategoriesPage() {
               />
               Show inactive
             </label>
-            <Select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-40">
-              <option value="">All</option>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </Select>
-          </div>
-        }
-      />
+              <Select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="w-full sm:w-40">
+                <option value="">All</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </Select>
+            </div>
+          }
+        />
 
       {error ? <InlineError message={error} /> : null}
 
@@ -180,7 +180,7 @@ export default function CategoriesPage() {
         </div>
 
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[520px] text-left text-sm">
             <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
               <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Name</th>
@@ -195,12 +195,12 @@ export default function CategoriesPage() {
                   <td className="py-2 pr-3 text-text-primary">{c.name}</td>
                   <td className="py-2 pr-3">{c.type}</td>
                   <td className="py-2 pr-3">{c.is_active ? "active" : "inactive"}</td>
-                  <td className="py-2 text-right">
-                    <div className="inline-flex items-center gap-2">
-                      <Button variant="ghost" type="button" onClick={() => setEditingId(c.id)}>
+                    <td className="py-2 text-right">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <Button variant="ghost" size="sm" type="button" onClick={() => setEditingId(c.id)}>
                         Edit
                       </Button>
-                      <Button variant="danger" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
+                      <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
                         Delete
                       </Button>
                     </div>

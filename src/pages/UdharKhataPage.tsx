@@ -218,34 +218,34 @@ export default function UdharKhataPage() {
 
   return (
     <div className="space-y-5">
-      <SectionTitle
-        title="Udhar Khata"
-        subtitle="Track money you lend (given/recovered) and money you borrow (taken/paid back)."
-        right={
-          <div className="flex items-center gap-2">
-            <Button type="button" variant={direction === "lent" ? "primary" : "ghost"} onClick={() => setDirection("lent")}>
-              {directionLabel("lent")}
-            </Button>
-            <Button
-              type="button"
-              variant={direction === "borrowed" ? "primary" : "ghost"}
-              onClick={() => setDirection("borrowed")}
-            >
-              {directionLabel("borrowed")}
-            </Button>
-          </div>
-        }
-      />
+        <SectionTitle
+          title="Udhar Khata"
+          subtitle="Track money you lend (given/recovered) and money you borrow (taken/paid back)."
+          right={
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="button" variant={direction === "lent" ? "primary" : "ghost"} onClick={() => setDirection("lent")}>
+                {directionLabel("lent")}
+              </Button>
+              <Button
+                type="button"
+                variant={direction === "borrowed" ? "primary" : "ghost"}
+                onClick={() => setDirection("borrowed")}
+              >
+                {directionLabel("borrowed")}
+              </Button>
+            </div>
+          }
+        />
 
       {error ? <InlineError message={error} /> : null}
 
       <Card>
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold text-text-primary">New {direction === "lent" ? "lend" : "borrow"} record</div>
-            <div className="text-xs text-text-muted">
-              {loading ? "Loading…" : `${items.length} loans • Outstanding ${formatAmount(totals.outstanding, currency)}`}
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-sm font-semibold text-text-primary">New {direction === "lent" ? "lend" : "borrow"} record</div>
+          <div className="text-xs text-text-muted">
+            {loading ? "Loading…" : `${items.length} loans • Outstanding ${formatAmount(totals.outstanding, currency)}`}
           </div>
+        </div>
 
         <form className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-6" onSubmit={onCreateLoan}>
           <div className="md:col-span-6 flex flex-wrap items-center gap-3 text-sm text-text-secondary">
@@ -462,7 +462,7 @@ export default function UdharKhataPage() {
                 <div className="mt-3 space-y-2">
                   {(selected.entries ?? []).map((e) => (
                     <div key={e.id} className="rounded-xl border border-surface-border bg-surface-raised/40 px-3 py-2">
-                      <div className="flex items-center justify-between gap-2">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <div className="text-sm font-semibold text-text-primary">
                             {e.kind === "disbursement" ? disbursementLabel(direction) : repaymentLabel(direction)}
@@ -471,9 +471,9 @@ export default function UdharKhataPage() {
                             {new Date(e.occurred_at).toLocaleString()} {e.note ? `• ${e.note}` : ""} • #{e.id}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
                           <div className="text-sm font-semibold text-text-primary">{formatAmount(e.amount, selected.currency)}</div>
-                          <Button type="button" variant="ghost" disabled={busy} onClick={() => onDeleteEntry(e.id)}>
+                          <Button size="sm" type="button" variant="ghost" disabled={busy} onClick={() => onDeleteEntry(e.id)}>
                             Delete
                           </Button>
                         </div>

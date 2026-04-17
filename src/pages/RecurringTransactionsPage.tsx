@@ -148,7 +148,7 @@ export default function RecurringTransactionsPage() {
 
       {showForm && (
         <Card>
-          <div className="text-sm font-semibold text-white mb-3">New Recurring Transaction</div>
+          <div className="mb-3 text-sm font-semibold text-text-primary">New Recurring Transaction</div>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Field label="Type">
@@ -256,7 +256,7 @@ export default function RecurringTransactionsPage() {
       )}
 
       <Card>
-        <div className="text-sm font-semibold text-white mb-3">Active Recurring Transactions</div>
+        <div className="mb-3 text-sm font-semibold text-text-primary">Active Recurring Transactions</div>
 
         <div className="space-y-2">
           {items.length === 0 ? (
@@ -272,11 +272,11 @@ export default function RecurringTransactionsPage() {
               return (
                 <div
                   key={item.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-surface-border bg-surface-raised/40"
+                  className="flex flex-col gap-3 rounded-xl border border-surface-border bg-surface-raised/40 p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium text-text-primary">
                         {frequencyLabel(item.frequency, item.interval)}
                       </span>
                       <span
@@ -300,11 +300,11 @@ export default function RecurringTransactionsPage() {
                       {item.end_date ? ` · Until: ${item.end_date}` : ""}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-sm font-semibold text-white tabular-nums">
+                  <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end">
+                    <div className="text-sm font-semibold text-text-primary tabular-nums">
                       {formatAmount(item.amount, account?.currency)}
                     </div>
-                    <Button variant="danger" type="button" onClick={() => onDelete(item.id)}>
+                    <Button variant="danger" size="sm" type="button" onClick={() => onDelete(item.id)}>
                       Delete
                     </Button>
                   </div>

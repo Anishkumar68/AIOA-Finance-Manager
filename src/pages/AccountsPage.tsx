@@ -205,7 +205,7 @@ export default function AccountsPage() {
         </div>
 
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
               <tr className="border-b border-surface-border">
                 <th className="py-2 pr-3 font-medium">Name</th>
@@ -225,11 +225,11 @@ export default function AccountsPage() {
                   <td className="py-2 pr-3">{a.is_active ? "active" : "archived"}</td>
                   <td className="py-2 text-right tabular-nums text-text-primary">{formatAmount(a.current_balance, a.currency)}</td>
                   <td className="py-2 text-right">
-                    <div className="inline-flex items-center gap-2">
-                      <Button variant="ghost" type="button" onClick={() => setEditingId(a.id)}>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <Button variant="ghost" size="sm" type="button" onClick={() => setEditingId(a.id)}>
                         Edit
                       </Button>
-                      <Button variant="danger" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
+                      <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
                         Archive
                       </Button>
                     </div>

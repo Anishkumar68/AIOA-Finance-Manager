@@ -166,7 +166,7 @@ export default function DashboardPage() {
           />
 
           <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[520px] text-left text-sm">
               <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
                 <tr className="border-b border-surface-border">
                   <th className="py-2 pr-3">Date</th>

@@ -25,7 +25,7 @@ export function SectionTitle({
         )}
       </div>
       {right && (
-        <div className="flex items-center gap-2">{right}</div>
+        <div className="flex flex-wrap items-center justify-end gap-2">{right}</div>
       )}
     </div>
   );

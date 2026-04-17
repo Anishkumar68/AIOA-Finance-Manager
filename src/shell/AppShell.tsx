@@ -192,7 +192,7 @@ export default function AppShell() {
       {/* ── Main ────────────────────────────────────────────── */}
       <div className="relative flex flex-1 flex-col overflow-hidden">
         {/* Top bar — page-level actions injected via context or slots if needed */}
-        <header className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-surface-border bg-surface-raised/70 px-4 py-3.5 backdrop-blur supports-[backdrop-filter]:bg-surface-raised/55 md:px-6">
+        <header className="sticky top-0 z-30 flex shrink-0 flex-col gap-3 border-b border-surface-border bg-surface-raised/70 px-4 py-3.5 backdrop-blur supports-[backdrop-filter]:bg-surface-raised/55 sm:flex-row sm:items-center sm:justify-between md:px-6">
           <div className="flex items-center gap-3">
             <div className="md:hidden">
               <IconButton label="Open sidebar" type="button" onClick={() => setSidebarOpen(true)}>
@@ -205,7 +205,7 @@ export default function AppShell() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
             <Button variant="secondary" size="sm" type="button" onClick={handleExport} disabled={exporting}>
               <Download size={14} className="opacity-80" /> {exporting ? "Exporting…" : "Export"}
             </Button>

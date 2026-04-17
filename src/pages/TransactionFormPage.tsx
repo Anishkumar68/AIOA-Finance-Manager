@@ -286,12 +286,12 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
 
             {/* New tag input */}
             {showNewTagInput ? (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Input
                   value={newTagName}
                   onChange={(e) => setNewTagName(e.target.value)}
                   placeholder="New tag name"
-                  className="!py-1 !px-2 !text-xs"
+                  className="min-w-[180px] flex-1 !px-2 !py-1 !text-xs"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
