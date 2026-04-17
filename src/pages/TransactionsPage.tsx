@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Card, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
+import { Button, Card, CardDivider, CardHeader, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
 import {
   deleteTransaction,
   exportTransactionsUrl,
@@ -9,6 +9,7 @@ import {
   getTags,
   getTransactions,
   importTransactionsCsv,
+  importTransactionsPdf,
   importTransactionsTemplateUrl,
   TransactionImportResponse
 } from "../lib/api";
@@ -34,8 +35,14 @@ export default function TransactionsPage() {
   const [allTags, setAllTags] = useState<any[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const pdfInputRef = useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<TransactionImportResponse | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importDialogFile, setImportDialogFile] = useState<File | null>(null);
+  const [importDialogKind, setImportDialogKind] = useState<"csv" | "pdf">("csv");
+  const [importDialogAccountId, setImportDialogAccountId] = useState("");
+  const [importDialogAccountRequired, setImportDialogAccountRequired] = useState(false);
 
   const accountById = useMemo(() => new Map(accounts.map((a) => [a.id, a])), [accounts]);
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
@@ -148,11 +155,23 @@ export default function TransactionsPage() {
     fileInputRef.current?.click();
   }
 
-  async function handleImportFile(file: File) {
+  function handleImportPdfClick() {
+    setImportResult(null);
+    pdfInputRef.current?.click();
+  }
+
+  async function handleImportFile(
+    kind: "csv" | "pdf",
+    file: File,
+    opts: { default_account_id?: number } = {}
+  ) {
     setImporting(true);
     setError(null);
     try {
-      const res = await importTransactionsCsv(file, { mode: "partial" });
+      const res =
+        kind === "pdf"
+          ? await importTransactionsPdf(file, { mode: "partial", default_account_id: opts.default_account_id! })
+          : await importTransactionsCsv(file, { mode: "partial", default_account_id: opts.default_account_id });
       setImportResult(res);
       if (res.imported > 0) await load(1);
     } catch (e: any) {
@@ -177,7 +196,40 @@ export default function TransactionsPage() {
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 e.target.value = "";
-                if (f) handleImportFile(f);
+                if (!f) return;
+                (async () => {
+                  try {
+                    const head = (await f.slice(0, 4096).text()).split(/\r?\n/)[0] || "";
+                    const lower = head.toLowerCase();
+                    const isBankLike =
+                      lower.includes("transaction date") ||
+                      lower.includes("value date") ||
+                      lower.includes("description/narration") ||
+                      lower.includes("debit");
+                    const hasAccountColumn = lower.includes("account id") || /(^|,)account(,|$)/.test(lower);
+                    setImportDialogAccountRequired(isBankLike && !hasAccountColumn);
+                  } catch {
+                    setImportDialogAccountRequired(false);
+                  }
+                  setImportDialogKind("csv");
+                  setImportDialogFile(f);
+                  setImportDialogOpen(true);
+                })();
+              }}
+            />
+            <input
+              ref={pdfInputRef}
+              type="file"
+              accept=".pdf,application/pdf"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (!f) return;
+                setImportDialogKind("pdf");
+                setImportDialogAccountRequired(true);
+                setImportDialogFile(f);
+                setImportDialogOpen(true);
               }}
             />
             <Button variant="ghost" type="button" onClick={() => window.open(importTransactionsTemplateUrl(), "_blank")}>
@@ -185,6 +237,9 @@ export default function TransactionsPage() {
             </Button>
             <Button variant="ghost" type="button" onClick={handleImportClick} disabled={importing}>
               {importing ? "Importing…" : "Import CSV"}
+            </Button>
+            <Button variant="ghost" type="button" onClick={handleImportPdfClick} disabled={importing}>
+              Import PDF
             </Button>
             <Button variant="ghost" type="button" onClick={handleExport}>
               Export CSV
@@ -197,6 +252,123 @@ export default function TransactionsPage() {
       />
 
       {error ? <InlineError message={error} /> : null}
+
+      {importDialogOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <Card className="w-full max-w-xl">
+            <CardHeader
+              title={importDialogKind === "pdf" ? "Import credit card statement PDF" : "Import bank statement CSV"}
+              description={
+                importDialogKind === "pdf"
+                  ? "Text-based PDFs supported. If your statement is scanned, export a CSV or enable OCR on the server."
+                  : "Columns supported: Transaction Date, Value Date, Description/Narration, Cheque/ Reference No., Debit (INR), Credit (INR), Balance (INR)."
+              }
+              right={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setImportDialogOpen(false);
+                    setImportDialogFile(null);
+                    setImportDialogAccountId("");
+                    setImportDialogAccountRequired(false);
+                    setImportDialogKind("csv");
+                  }}
+                >
+                  Close
+                </Button>
+              }
+            />
+
+            <CardDivider />
+
+            <div className="space-y-3">
+              <div className="text-xs text-text-muted">
+                File: <span className="font-medium text-text-secondary">{importDialogFile?.name}</span>
+              </div>
+
+              <Field label={importDialogAccountRequired ? "Account (required for bank statement imports)" : "Default account (optional)"}>
+                <Select value={importDialogAccountId} onChange={(e) => setImportDialogAccountId(e.target.value)}>
+                  <option value="">Select account…</option>
+                  {accounts.map((a) => (
+                    <option key={a.id} value={String(a.id)}>
+                      {a.name}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+
+              <div className="overflow-x-auto rounded-lg border border-surface-border bg-surface-raised/30">
+                <table className="w-full text-left text-xs">
+                  <thead className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-faint">
+                    <tr className="border-b border-surface-border">
+                      {[
+                        "Transaction Date",
+                        "Value Date",
+                        "Description/Narration",
+                        "Cheque/ Reference No.",
+                        "Debit (INR)",
+                        "Credit (INR)",
+                        "Balance (INR)",
+                      ].map((h) => (
+                        <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="text-text-secondary">
+                    <tr className="border-b border-surface-border/70 last:border-b-0">
+                      <td className="whitespace-nowrap px-3 py-2 tabular-nums">2026-01-15</td>
+                      <td className="whitespace-nowrap px-3 py-2 tabular-nums">2026-01-15</td>
+                      <td className="px-3 py-2">Grocery shopping</td>
+                      <td className="whitespace-nowrap px-3 py-2">INV-123</td>
+                      <td className="whitespace-nowrap px-3 py-2 tabular-nums">250.00</td>
+                      <td className="whitespace-nowrap px-3 py-2 tabular-nums"></td>
+                      <td className="whitespace-nowrap px-3 py-2 tabular-nums">4750.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setImportDialogOpen(false);
+                    setImportDialogFile(null);
+                    setImportDialogAccountId("");
+                    setImportDialogAccountRequired(false);
+                    setImportDialogKind("csv");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  disabled={!importDialogFile || importing || (importDialogAccountRequired && !importDialogAccountId)}
+                  onClick={async () => {
+                    if (!importDialogFile) return;
+                    setImportDialogOpen(false);
+                    const f = importDialogFile;
+                    const accId = importDialogAccountId ? Number(importDialogAccountId) : undefined;
+                    setImportDialogFile(null);
+                    setImportDialogAccountId("");
+                    setImportDialogAccountRequired(false);
+                    const kind = importDialogKind;
+                    setImportDialogKind("csv");
+                    if (kind === "pdf" && !accId) return;
+                    await handleImportFile(kind, f, { default_account_id: accId });
+                  }}
+                >
+                  {importing ? "Importing…" : "Import"}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ) : null}
 
       {importResult ? (
         <Card>

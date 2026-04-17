@@ -274,7 +274,7 @@ export function importTransactionsTemplateUrl() {
 
 export async function importTransactionsCsv(
   file: File,
-  options: { mode?: "partial" | "all_or_nothing"; dry_run?: boolean } = {}
+  options: { mode?: "partial" | "all_or_nothing"; dry_run?: boolean; default_account_id?: number } = {}
 ) {
   const API_BASE =
     (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
@@ -283,8 +283,57 @@ export async function importTransactionsCsv(
   const params = new URLSearchParams();
   if (options.mode) params.set("mode", options.mode);
   if (options.dry_run) params.set("dry_run", "true");
+  if (options.default_account_id) params.set("default_account_id", String(options.default_account_id));
 
   const url = `${API_BASE}/api/v1/transactions/import${params.toString() ? `?${params.toString()}` : ""}`;
+  const tokens = getTokens();
+
+  const form = new FormData();
+  form.append("file", file);
+
+  async function doFetch() {
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        ...(tokens ? { Authorization: `Bearer ${tokens.accessToken}` } : {})
+      },
+      body: form
+    });
+  }
+
+  let res = await doFetch();
+  if (res.status === 401) {
+    const refreshed = await refreshAccessToken();
+    if (refreshed) {
+      const nextTokens = getTokens();
+      res = await fetch(url, {
+        method: "POST",
+        headers: {
+          ...(nextTokens ? { Authorization: `Bearer ${nextTokens.accessToken}` } : {})
+        },
+        body: form
+      });
+    }
+  }
+
+  if (!res.ok) throw await parseError(res);
+  return (await res.json()) as TransactionImportResponse;
+}
+
+export async function importTransactionsPdf(
+  file: File,
+  options: { mode?: "partial" | "all_or_nothing"; dry_run?: boolean; default_account_id: number } 
+) {
+  const API_BASE =
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
+    (import.meta.env.DEV ? "http://localhost:8000" : "");
+
+  const params = new URLSearchParams();
+  if (options.mode) params.set("mode", options.mode);
+  if (options.dry_run) params.set("dry_run", "true");
+  params.set("default_account_id", String(options.default_account_id));
+
+  const url = `${API_BASE}/api/v1/transactions/import-pdf${params.toString() ? `?${params.toString()}` : ""}`;
   const tokens = getTokens();
 
   const form = new FormData();
