@@ -231,18 +231,15 @@ export default function AccountsPage() {
                       <Button variant="ghost" size="sm" type="button" onClick={() => setEditingId(a.id)}>
                         Edit
                       </Button>
-<<<<<<< HEAD
-                      <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
-=======
                       <Button
                         variant="ghost"
+                        size="sm"
                         type="button"
                         onClick={() => navigate(`/transactions?account_id=${encodeURIComponent(String(a.id))}`)}
                       >
                         Transactions
                       </Button>
-                      <Button variant="danger" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
->>>>>>> 978ea57 (connected all wireframes)
+                      <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
                         Archive
                       </Button>
                     </div>

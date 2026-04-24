@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-<<<<<<< HEAD
-import { Link } from "react-router-dom";
-import { Button, Card, CardDivider, CardHeader, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
-=======
 import { Link, useSearchParams } from "react-router-dom";
-import { Button, Card, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
->>>>>>> 978ea57 (connected all wireframes)
+import { Button, Card, CardDivider, CardHeader, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
 import {
   deleteTransaction,
   exportTransactionsUrl,
@@ -38,21 +33,20 @@ export default function TransactionsPage() {
   const [type, setType] = useState<string>(() => searchParams.get("type") ?? "");
   const [search, setSearch] = useState<string>(() => searchParams.get("search") ?? "");
   const [tagId, setTagId] = useState<string>(() => searchParams.get("tag_id") ?? "");
+  const [minAmount, setMinAmount] = useState<string>(() => searchParams.get("min_amount") ?? "");
+  const [maxAmount, setMaxAmount] = useState<string>(() => searchParams.get("max_amount") ?? "");
   const [allTags, setAllTags] = useState<any[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const pdfInputRef = useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<TransactionImportResponse | null>(null);
-<<<<<<< HEAD
+  const [pdfPassword, setPdfPassword] = useState("");
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importDialogFile, setImportDialogFile] = useState<File | null>(null);
   const [importDialogKind, setImportDialogKind] = useState<"csv" | "pdf">("csv");
   const [importDialogAccountId, setImportDialogAccountId] = useState("");
   const [importDialogAccountRequired, setImportDialogAccountRequired] = useState(false);
-=======
-  const [pdfPassword, setPdfPassword] = useState("");
->>>>>>> 978ea57 (connected all wireframes)
 
   const accountById = useMemo(() => new Map(accounts.map((a) => [a.id, a])), [accounts]);
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
@@ -84,6 +78,8 @@ export default function TransactionsPage() {
     const nextType = searchParams.get("type") ?? "";
     const nextSearch = searchParams.get("search") ?? "";
     const nextTag = searchParams.get("tag_id") ?? "";
+    const nextMin = searchParams.get("min_amount") ?? "";
+    const nextMax = searchParams.get("max_amount") ?? "";
 
     if (nextFrom !== fromDate) setFromDate(nextFrom);
     if (nextTo !== toDate) setToDate(nextTo);
@@ -92,6 +88,8 @@ export default function TransactionsPage() {
     if (nextType !== type) setType(nextType);
     if (nextSearch !== search) setSearch(nextSearch);
     if (nextTag !== tagId) setTagId(nextTag);
+    if (nextMin !== minAmount) setMinAmount(nextMin);
+    if (nextMax !== maxAmount) setMaxAmount(nextMax);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
@@ -105,12 +103,14 @@ export default function TransactionsPage() {
     if (type) params.set("type", type);
     if (search) params.set("search", search);
     if (tagId) params.set("tag_id", tagId);
+    if (minAmount) params.set("min_amount", minAmount);
+    if (maxAmount) params.set("max_amount", maxAmount);
 
     const next = params.toString();
     const current = searchParams.toString();
     if (next !== current) setSearchParams(params, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fromDate, toDate, accountId, categoryId, type, search, tagId]);
+  }, [fromDate, toDate, accountId, categoryId, type, search, tagId, minAmount, maxAmount]);
 
   async function load(nextPage: number) {
     setLoading(true);
@@ -124,6 +124,8 @@ export default function TransactionsPage() {
         type: type || undefined,
         search: search || undefined,
         tag_id: tagId ? Number(tagId) : undefined,
+        min_amount: minAmount ? Number(minAmount) : undefined,
+        max_amount: maxAmount ? Number(maxAmount) : undefined,
         page: nextPage,
         limit: 20
       });
@@ -161,7 +163,10 @@ export default function TransactionsPage() {
       account_id: accountId ? Number(accountId) : undefined,
       category_id: categoryId ? Number(categoryId) : undefined,
       type: type || undefined,
-      search: search || undefined
+      search: search || undefined,
+      tag_id: tagId ? Number(tagId) : undefined,
+      min_amount: minAmount ? Number(minAmount) : undefined,
+      max_amount: maxAmount ? Number(maxAmount) : undefined
     });
 
     // Get auth token
@@ -202,15 +207,11 @@ export default function TransactionsPage() {
     pdfInputRef.current?.click();
   }
 
-<<<<<<< HEAD
   async function handleImportFile(
     kind: "csv" | "pdf",
     file: File,
     opts: { default_account_id?: number } = {}
   ) {
-=======
-  async function handleImportFile(file: File) {
->>>>>>> 978ea57 (connected all wireframes)
     setImporting(true);
     setError(null);
     try {
@@ -319,10 +320,6 @@ export default function TransactionsPage() {
             <Button variant="ghost" type="button" onClick={handleImportClick} disabled={importing}>
               {importing ? "Importing…" : "Import CSV"}
             </Button>
-<<<<<<< HEAD
-            <Button variant="ghost" type="button" onClick={handleImportPdfClick} disabled={importing}>
-              Import PDF
-=======
             <div className="hidden md:block">
               <Input
                 type="password"
@@ -335,7 +332,6 @@ export default function TransactionsPage() {
             </div>
             <Button variant="ghost" type="button" onClick={handleImportPdfClick} disabled={importing}>
               {importing ? "Importing…" : "Import PDF"}
->>>>>>> 978ea57 (connected all wireframes)
             </Button>
             <Button variant="ghost" type="button" onClick={handleExport}>
               Export CSV
@@ -507,12 +503,18 @@ export default function TransactionsPage() {
 
       <Card>
         <div className="text-sm font-semibold text-text-primary">Filters</div>
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-9">
           <Field label="From">
             <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
           </Field>
           <Field label="To">
             <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+          </Field>
+          <Field label="Min amount">
+            <Input inputMode="decimal" value={minAmount} onChange={(e) => setMinAmount(e.target.value)} placeholder="0" />
+          </Field>
+          <Field label="Max amount">
+            <Input inputMode="decimal" value={maxAmount} onChange={(e) => setMaxAmount(e.target.value)} placeholder="0" />
           </Field>
           <Field label="Type">
             <Select value={type} onChange={(e) => setType(e.target.value)}>

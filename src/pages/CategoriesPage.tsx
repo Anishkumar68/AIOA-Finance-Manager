@@ -202,11 +202,9 @@ export default function CategoriesPage() {
                       <Button variant="ghost" size="sm" type="button" onClick={() => setEditingId(c.id)}>
                         Edit
                       </Button>
-<<<<<<< HEAD
-                      <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
-=======
                       <Button
                         variant="ghost"
+                        size="sm"
                         type="button"
                         onClick={() => {
                           const qs = new URLSearchParams();
@@ -217,8 +215,7 @@ export default function CategoriesPage() {
                       >
                         Transactions
                       </Button>
-                      <Button variant="danger" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
->>>>>>> 978ea57 (connected all wireframes)
+                      <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
                         Delete
                       </Button>
                     </div>

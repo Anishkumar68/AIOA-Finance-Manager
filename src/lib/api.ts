@@ -219,6 +219,8 @@ export async function getTransactions(filters: {
   type?: string;
   search?: string;
   tag_id?: number;
+  min_amount?: number;
+  max_amount?: number;
   page?: number;
   limit?: number;
 }) {
@@ -248,6 +250,9 @@ export function exportTransactionsUrl(filters: {
   category_id?: number;
   type?: string;
   search?: string;
+  tag_id?: number;
+  min_amount?: number;
+  max_amount?: number;
 }) {
   const params = new URLSearchParams();
   if (filters.from_date) params.set("from_date", filters.from_date);
@@ -256,6 +261,9 @@ export function exportTransactionsUrl(filters: {
   if (filters.category_id) params.set("category_id", String(filters.category_id));
   if (filters.type) params.set("type", filters.type);
   if (filters.search) params.set("search", filters.search);
+  if (filters.tag_id) params.set("tag_id", String(filters.tag_id));
+  if (filters.min_amount !== undefined) params.set("min_amount", String(filters.min_amount));
+  if (filters.max_amount !== undefined) params.set("max_amount", String(filters.max_amount));
 
   const API_BASE =
     (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
@@ -322,41 +330,28 @@ export async function importTransactionsCsv(
 
 export async function importTransactionsPdf(
   file: File,
-<<<<<<< HEAD
-  options: { mode?: "partial" | "all_or_nothing"; dry_run?: boolean; default_account_id: number } 
-=======
   options: {
     default_account_id: number;
     pdf_password?: string;
     mode?: "partial" | "all_or_nothing";
     dry_run?: boolean;
   }
->>>>>>> 978ea57 (connected all wireframes)
 ) {
   const API_BASE =
     (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
     (import.meta.env.DEV ? "http://localhost:8000" : "");
 
   const params = new URLSearchParams();
-<<<<<<< HEAD
-  if (options.mode) params.set("mode", options.mode);
-  if (options.dry_run) params.set("dry_run", "true");
-  params.set("default_account_id", String(options.default_account_id));
-=======
   params.set("default_account_id", String(options.default_account_id));
   if (options.mode) params.set("mode", options.mode);
   if (options.dry_run) params.set("dry_run", "true");
->>>>>>> 978ea57 (connected all wireframes)
 
   const url = `${API_BASE}/api/v1/transactions/import-pdf${params.toString() ? `?${params.toString()}` : ""}`;
   const tokens = getTokens();
 
   const form = new FormData();
   form.append("file", file);
-<<<<<<< HEAD
-=======
   if (options.pdf_password) form.append("pdf_password", options.pdf_password);
->>>>>>> 978ea57 (connected all wireframes)
 
   async function doFetch() {
     return fetch(url, {
@@ -688,4 +683,21 @@ export async function addGoalContribution(goalId: number, body: { amount: number
 
 export async function deleteGoalContribution(goalId: number, contributionId: number) {
   return request<void>(`/api/v1/goals/${goalId}/contributions/${contributionId}`, { method: "DELETE" });
+}
+
+// Password reset
+export async function forgotPassword(email: string) {
+  return request<{ message: string; reset_token?: string | null }>("/api/v1/auth/forgot-password", {
+    method: "POST",
+    auth: false,
+    body: { email }
+  });
+}
+
+export async function resetPassword(body: { token: string; new_password: string }) {
+  return request<{ message: string }>("/api/v1/auth/reset-password", {
+    method: "POST",
+    auth: false,
+    body
+  });
 }

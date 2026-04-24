@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { Badge, Button, Card, CardDivider, InlineError, Input } from "../components/ui";
 import { Lock, Sparkles } from "lucide-react";
@@ -142,9 +142,14 @@ export default function LoginPage() {
 
               <CardDivider className="my-3" />
 
-              <div className="text-xs text-text-muted">
-                Demo: <span className="text-text-secondary">demo@example.com</span> /{" "}
-                <span className="text-text-secondary">demopassword</span>
+              <div className="flex items-center justify-between gap-2 text-xs text-text-muted">
+                <Link to="/forgot-password" className="text-text-secondary underline">
+                  Forgot password?
+                </Link>
+                <div>
+                  Demo: <span className="text-text-secondary">demo@example.com</span> /{" "}
+                  <span className="text-text-secondary">demopassword</span>
+                </div>
               </div>
             </form>
           </Card>
