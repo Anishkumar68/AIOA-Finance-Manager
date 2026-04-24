@@ -414,6 +414,10 @@ export async function getAccountBalances() {
   return request<any>("/api/v1/reports/account-balances");
 }
 
+export async function getCashflowSeries(filters: { from_date: string; to_date: string; bucket?: "day" | "month" }) {
+  return request<any>("/api/v1/reports/cashflow-series", { query: filters as any });
+}
+
 export type Contact = {
   id: number;
   user_id: number;

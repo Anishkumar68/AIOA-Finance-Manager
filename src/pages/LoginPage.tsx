@@ -146,10 +146,7 @@ export default function LoginPage() {
                 <Link to="/forgot-password" className="text-text-secondary underline">
                   Forgot password?
                 </Link>
-                <div>
-                  Demo: <span className="text-text-secondary">demo@example.com</span> /{" "}
-                  <span className="text-text-secondary">demopassword</span>
-                </div>
+             
               </div>
             </form>
           </Card>
