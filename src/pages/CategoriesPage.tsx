@@ -1,8 +1,10 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Card, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
 import { createCategory, deleteCategory, getCategories, updateCategory } from "../lib/api";
 
 export default function CategoriesPage() {
+  const navigate = useNavigate();
   const [includeInactive, setIncludeInactive] = useState(false);
   const [filterType, setFilterType] = useState<string>("");
   const [items, setItems] = useState<any[]>([]);
@@ -200,7 +202,23 @@ export default function CategoriesPage() {
                       <Button variant="ghost" size="sm" type="button" onClick={() => setEditingId(c.id)}>
                         Edit
                       </Button>
+<<<<<<< HEAD
                       <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
+=======
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={() => {
+                          const qs = new URLSearchParams();
+                          qs.set("category_id", String(c.id));
+                          if (c.type) qs.set("type", String(c.type));
+                          navigate(`/transactions?${qs.toString()}`);
+                        }}
+                      >
+                        Transactions
+                      </Button>
+                      <Button variant="danger" type="button" disabled={busy} onClick={() => onDelete(c.id)}>
+>>>>>>> 978ea57 (connected all wireframes)
                         Delete
                       </Button>
                     </div>

@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+<<<<<<< HEAD
 import { Link } from "react-router-dom";
 import { Button, Card, CardDivider, CardHeader, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
+=======
+import { Link, useSearchParams } from "react-router-dom";
+import { Button, Card, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
+>>>>>>> 978ea57 (connected all wireframes)
 import {
   deleteTransaction,
   exportTransactionsUrl,
@@ -16,6 +21,7 @@ import {
 import { formatAmount } from "../lib/format";
 
 export default function TransactionsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState<any[]>([]);
@@ -25,24 +31,28 @@ export default function TransactionsPage() {
   const [pages, setPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [accountId, setAccountId] = useState<string>("");
-  const [categoryId, setCategoryId] = useState<string>("");
-  const [type, setType] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
-  const [tagId, setTagId] = useState<string>("");
+  const [fromDate, setFromDate] = useState(() => searchParams.get("from_date") ?? "");
+  const [toDate, setToDate] = useState(() => searchParams.get("to_date") ?? "");
+  const [accountId, setAccountId] = useState<string>(() => searchParams.get("account_id") ?? "");
+  const [categoryId, setCategoryId] = useState<string>(() => searchParams.get("category_id") ?? "");
+  const [type, setType] = useState<string>(() => searchParams.get("type") ?? "");
+  const [search, setSearch] = useState<string>(() => searchParams.get("search") ?? "");
+  const [tagId, setTagId] = useState<string>(() => searchParams.get("tag_id") ?? "");
   const [allTags, setAllTags] = useState<any[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const pdfInputRef = useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<TransactionImportResponse | null>(null);
+<<<<<<< HEAD
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importDialogFile, setImportDialogFile] = useState<File | null>(null);
   const [importDialogKind, setImportDialogKind] = useState<"csv" | "pdf">("csv");
   const [importDialogAccountId, setImportDialogAccountId] = useState("");
   const [importDialogAccountRequired, setImportDialogAccountRequired] = useState(false);
+=======
+  const [pdfPassword, setPdfPassword] = useState("");
+>>>>>>> 978ea57 (connected all wireframes)
 
   const accountById = useMemo(() => new Map(accounts.map((a) => [a.id, a])), [accounts]);
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
@@ -64,6 +74,43 @@ export default function TransactionsPage() {
       cancelled = true;
     };
   }, []);
+
+  // URL -> state (for cross-page deep links like /transactions?account_id=123)
+  useEffect(() => {
+    const nextFrom = searchParams.get("from_date") ?? "";
+    const nextTo = searchParams.get("to_date") ?? "";
+    const nextAccount = searchParams.get("account_id") ?? "";
+    const nextCategory = searchParams.get("category_id") ?? "";
+    const nextType = searchParams.get("type") ?? "";
+    const nextSearch = searchParams.get("search") ?? "";
+    const nextTag = searchParams.get("tag_id") ?? "";
+
+    if (nextFrom !== fromDate) setFromDate(nextFrom);
+    if (nextTo !== toDate) setToDate(nextTo);
+    if (nextAccount !== accountId) setAccountId(nextAccount);
+    if (nextCategory !== categoryId) setCategoryId(nextCategory);
+    if (nextType !== type) setType(nextType);
+    if (nextSearch !== search) setSearch(nextSearch);
+    if (nextTag !== tagId) setTagId(nextTag);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // state -> URL (so filters are shareable and pages can link into Transactions)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (fromDate) params.set("from_date", fromDate);
+    if (toDate) params.set("to_date", toDate);
+    if (accountId) params.set("account_id", accountId);
+    if (categoryId) params.set("category_id", categoryId);
+    if (type) params.set("type", type);
+    if (search) params.set("search", search);
+    if (tagId) params.set("tag_id", tagId);
+
+    const next = params.toString();
+    const current = searchParams.toString();
+    if (next !== current) setSearchParams(params, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromDate, toDate, accountId, categoryId, type, search, tagId]);
 
   async function load(nextPage: number) {
     setLoading(true);
@@ -90,11 +137,6 @@ export default function TransactionsPage() {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    load(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     load(1);
@@ -160,11 +202,15 @@ export default function TransactionsPage() {
     pdfInputRef.current?.click();
   }
 
+<<<<<<< HEAD
   async function handleImportFile(
     kind: "csv" | "pdf",
     file: File,
     opts: { default_account_id?: number } = {}
   ) {
+=======
+  async function handleImportFile(file: File) {
+>>>>>>> 978ea57 (connected all wireframes)
     setImporting(true);
     setError(null);
     try {
@@ -177,6 +223,30 @@ export default function TransactionsPage() {
     } catch (e: any) {
       setError(e?.message ? String(e.message) : "Failed to import transactions");
     } finally {
+      setImporting(false);
+    }
+  }
+
+  async function handleImportPdfFile(file: File) {
+    if (!accountId) {
+      setError("Select an account filter first (PDF import needs a default account).");
+      return;
+    }
+
+    setImporting(true);
+    setError(null);
+    try {
+      const res = await importTransactionsPdf(file, {
+        default_account_id: Number(accountId),
+        pdf_password: pdfPassword.trim() ? pdfPassword : undefined,
+        mode: "partial"
+      });
+      setImportResult(res);
+      if (res.imported > 0) await load(1);
+    } catch (e: any) {
+      setError(e?.message ? String(e.message) : "Failed to import PDF transactions");
+    } finally {
+      setPdfPassword("");
       setImporting(false);
     }
   }
@@ -232,14 +302,40 @@ export default function TransactionsPage() {
                 setImportDialogOpen(true);
               }}
             />
+            <input
+              ref={pdfInputRef}
+              type="file"
+              accept=".pdf,application/pdf"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) handleImportPdfFile(f);
+              }}
+            />
             <Button variant="ghost" type="button" onClick={() => window.open(importTransactionsTemplateUrl(), "_blank")}>
               Template
             </Button>
             <Button variant="ghost" type="button" onClick={handleImportClick} disabled={importing}>
               {importing ? "Importing…" : "Import CSV"}
             </Button>
+<<<<<<< HEAD
             <Button variant="ghost" type="button" onClick={handleImportPdfClick} disabled={importing}>
               Import PDF
+=======
+            <div className="hidden md:block">
+              <Input
+                type="password"
+                value={pdfPassword}
+                onChange={(e) => setPdfPassword(e.target.value)}
+                placeholder="PDF password"
+                autoComplete="off"
+                className="w-40"
+              />
+            </div>
+            <Button variant="ghost" type="button" onClick={handleImportPdfClick} disabled={importing}>
+              {importing ? "Importing…" : "Import PDF"}
+>>>>>>> 978ea57 (connected all wireframes)
             </Button>
             <Button variant="ghost" type="button" onClick={handleExport}>
               Export CSV

@@ -322,22 +322,41 @@ export async function importTransactionsCsv(
 
 export async function importTransactionsPdf(
   file: File,
+<<<<<<< HEAD
   options: { mode?: "partial" | "all_or_nothing"; dry_run?: boolean; default_account_id: number } 
+=======
+  options: {
+    default_account_id: number;
+    pdf_password?: string;
+    mode?: "partial" | "all_or_nothing";
+    dry_run?: boolean;
+  }
+>>>>>>> 978ea57 (connected all wireframes)
 ) {
   const API_BASE =
     (import.meta.env.VITE_API_BASE_URL as string | undefined) ??
     (import.meta.env.DEV ? "http://localhost:8000" : "");
 
   const params = new URLSearchParams();
+<<<<<<< HEAD
   if (options.mode) params.set("mode", options.mode);
   if (options.dry_run) params.set("dry_run", "true");
   params.set("default_account_id", String(options.default_account_id));
+=======
+  params.set("default_account_id", String(options.default_account_id));
+  if (options.mode) params.set("mode", options.mode);
+  if (options.dry_run) params.set("dry_run", "true");
+>>>>>>> 978ea57 (connected all wireframes)
 
   const url = `${API_BASE}/api/v1/transactions/import-pdf${params.toString() ? `?${params.toString()}` : ""}`;
   const tokens = getTokens();
 
   const form = new FormData();
   form.append("file", file);
+<<<<<<< HEAD
+=======
+  if (options.pdf_password) form.append("pdf_password", options.pdf_password);
+>>>>>>> 978ea57 (connected all wireframes)
 
   async function doFetch() {
     return fetch(url, {

@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Card, Field, InlineError, Input, SectionTitle, Select } from "../components/ui";
 import { archiveAccount, createAccount, getAccounts, updateAccount } from "../lib/api";
 import { formatAmount } from "../lib/format";
@@ -6,6 +7,7 @@ import { formatAmount } from "../lib/format";
 const ACCOUNT_TYPES = ["cash", "bank", "wallet", "credit_card"];
 
 export default function AccountsPage() {
+  const navigate = useNavigate();
   const [includeInactive, setIncludeInactive] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -229,7 +231,18 @@ export default function AccountsPage() {
                       <Button variant="ghost" size="sm" type="button" onClick={() => setEditingId(a.id)}>
                         Edit
                       </Button>
+<<<<<<< HEAD
                       <Button variant="danger" size="sm" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
+=======
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={() => navigate(`/transactions?account_id=${encodeURIComponent(String(a.id))}`)}
+                      >
+                        Transactions
+                      </Button>
+                      <Button variant="danger" type="button" disabled={busy} onClick={() => onArchive(a.id)}>
+>>>>>>> 978ea57 (connected all wireframes)
                         Archive
                       </Button>
                     </div>
