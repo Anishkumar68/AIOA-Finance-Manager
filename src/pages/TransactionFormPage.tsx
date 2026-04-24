@@ -159,6 +159,31 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
     }
   }
 
+  async function onDuplicate() {
+    if (!id) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const payload: any = {
+        type,
+        amount: Number(amount),
+        account_id: Number(accountId),
+        date: todayIso(),
+        note: note.trim() || null,
+        reference: reference.trim() || null,
+        category_id: type === "transfer" ? null : Number(categoryId),
+        transfer_account_id: type === "transfer" ? Number(transferAccountId) : null,
+        tag_ids: selectedTagIds.length > 0 ? selectedTagIds : undefined
+      };
+      const created = await createTransaction(payload);
+      navigate(`/transactions/${created.id}/edit`);
+    } catch (e: any) {
+      setError(e?.message ? String(e.message) : "Failed to duplicate transaction");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="space-y-5">
       <SectionTitle
@@ -338,6 +363,11 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
             <Button type="submit" disabled={loading || busy || !canSubmit}>
               {busy ? "Saving…" : "Save"}
             </Button>
+            {mode === "edit" ? (
+              <Button type="button" variant="ghost" disabled={loading || busy || !canSubmit} onClick={onDuplicate}>
+                Duplicate
+              </Button>
+            ) : null}
             <Button type="button" variant="ghost" disabled={loading || busy} onClick={() => navigate("/transactions")}>
               Cancel
             </Button>
