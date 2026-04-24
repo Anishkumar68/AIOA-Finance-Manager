@@ -6,6 +6,7 @@ import AccountsPage from "./pages/AccountsPage";
 import BudgetsPage from "./pages/BudgetsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import DashboardPage from "./pages/DashboardPage";
+import GoalsPage from "./pages/GoalsPage";
 import LoginPage from "./pages/LoginPage";
 import RecurringTransactionsPage from "./pages/RecurringTransactionsPage";
 import ReportsPage from "./pages/ReportsPage";
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="transactions/new" element={<TransactionFormPage mode="create" />} />
           <Route path="transactions/:id/edit" element={<TransactionFormPage mode="edit" />} />
           <Route path="budgets" element={<BudgetsPage />} />
+          <Route path="goals" element={<GoalsPage />} />
           <Route path="recurring" element={<RecurringTransactionsPage />} />
           <Route path="udhar" element={<UdharKhataPage />} />
           <Route path="reports" element={<ReportsPage />} />

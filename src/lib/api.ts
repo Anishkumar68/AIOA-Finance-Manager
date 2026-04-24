@@ -613,3 +613,79 @@ export async function updateTag(id: number, body: { name?: string; color?: strin
 export async function deleteTag(id: number) {
   return request<void>(`/api/v1/tags/${id}`, { method: "DELETE" });
 }
+
+// Goals
+export type Goal = {
+  id: number;
+  user_id: number;
+  name: string;
+  currency: string;
+  target_amount: string | number;
+  start_date: string;
+  target_date?: string | null;
+  note?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  saved_amount: string | number;
+  remaining_amount: string | number;
+  progress_pct: number;
+  is_completed: boolean;
+  contributions_count: number;
+};
+
+export type GoalContribution = {
+  id: number;
+  user_id: number;
+  goal_id: number;
+  amount: string | number;
+  date: string;
+  note?: string | null;
+  created_at: string;
+};
+
+export async function getGoals(includeInactive = false) {
+  return request<Goal[]>("/api/v1/goals/", { query: { include_inactive: includeInactive } });
+}
+
+export async function createGoal(body: {
+  name: string;
+  currency?: string;
+  target_amount: number;
+  start_date: string;
+  target_date?: string;
+  note?: string;
+}) {
+  return request<Goal>("/api/v1/goals/", { method: "POST", body });
+}
+
+export async function updateGoal(
+  id: number,
+  body: Partial<{
+    name: string;
+    currency: string;
+    target_amount: number;
+    start_date: string;
+    target_date: string;
+    note: string;
+    is_active: boolean;
+  }>
+) {
+  return request<Goal>(`/api/v1/goals/${id}`, { method: "PUT", body });
+}
+
+export async function deleteGoal(id: number) {
+  return request<void>(`/api/v1/goals/${id}`, { method: "DELETE" });
+}
+
+export async function getGoalContributions(goalId: number) {
+  return request<GoalContribution[]>(`/api/v1/goals/${goalId}/contributions`);
+}
+
+export async function addGoalContribution(goalId: number, body: { amount: number; date?: string; note?: string }) {
+  return request<GoalContribution>(`/api/v1/goals/${goalId}/contributions`, { method: "POST", body });
+}
+
+export async function deleteGoalContribution(goalId: number, contributionId: number) {
+  return request<void>(`/api/v1/goals/${goalId}/contributions/${contributionId}`, { method: "DELETE" });
+}
