@@ -69,6 +69,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    function handleAuthExpired() {
+      setUser(null);
+      setLoading(false);
+    }
+
+    window.addEventListener("aioa:auth-expired", handleAuthExpired);
+    return () => window.removeEventListener("aioa:auth-expired", handleAuthExpired);
+  }, []);
+
   async function loginWithPassword(email: string, password: string) {
     const res = await api.login(email, password);
     setTokens({ accessToken: res.access_token, refreshToken: res.refresh_token });

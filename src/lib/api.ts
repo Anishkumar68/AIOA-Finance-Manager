@@ -1,4 +1,4 @@
-import { getTokens, setAccessToken } from "../auth/authStorage";
+import { clearTokens, getTokens, setAccessToken } from "../auth/authStorage";
 
 export type ApiError = {
   status: number;
@@ -67,6 +67,8 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     if (refreshed) {
       return request<T>(path, { ...options, retryOn401: false });
     }
+    clearTokens();
+    window.dispatchEvent(new Event("aioa:auth-expired"));
   }
 
   if (!res.ok) throw await parseError(res);

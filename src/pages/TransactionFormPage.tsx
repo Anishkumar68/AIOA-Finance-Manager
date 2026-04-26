@@ -32,14 +32,20 @@ export default function TransactionFormPage({ mode }: { mode: "create" | "edit" 
     let cancelled = false;
     (async () => {
       try {
-        const [a, c, t] = await Promise.all([getAccounts(true), getCategories(undefined, true), getTags()]);
+        const [a, c] = await Promise.all([getAccounts(true), getCategories(undefined, true)]);
         if (cancelled) return;
         setAccounts(a);
         setCategories(c);
-        setAllTags(t.items);
         if (!accountId && a.length) setAccountId(String(a.find((x) => x.is_active)?.id ?? a[0].id));
       } catch (e: any) {
         if (!cancelled) setError(e?.message ? String(e.message) : "Failed to load form data");
+      }
+
+      try {
+        const t = await getTags();
+        if (!cancelled) setAllTags(t.items);
+      } catch {
+        if (!cancelled) setAllTags([]);
       }
     })();
     return () => {

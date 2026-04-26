@@ -13,6 +13,7 @@ import {
   importTransactionsTemplateUrl,
   TransactionImportResponse
 } from "../lib/api";
+import { getTokens } from "../auth/authStorage";
 import { formatAmount } from "../lib/format";
 
 export default function TransactionsPage() {
@@ -55,13 +56,19 @@ export default function TransactionsPage() {
     let cancelled = false;
     (async () => {
       try {
-        const [a, c, t] = await Promise.all([getAccounts(true), getCategories(undefined, true), getTags()]);
+        const [a, c] = await Promise.all([getAccounts(true), getCategories(undefined, true)]);
         if (cancelled) return;
         setAccounts(a);
         setCategories(c);
-        setAllTags(t.items);
       } catch {
         // non-fatal; page still works with ids
+      }
+
+      try {
+        const t = await getTags();
+        if (!cancelled) setAllTags(t.items);
+      } catch {
+        if (!cancelled) setAllTags([]);
       }
     })();
     return () => {
@@ -169,10 +176,9 @@ export default function TransactionsPage() {
       max_amount: maxAmount ? Number(maxAmount) : undefined
     });
 
-    // Get auth token
-    const tokens = JSON.parse(localStorage.getItem("auth_tokens") || "{}");
+    const tokens = getTokens();
     const headers: HeadersInit = {};
-    if (tokens.accessToken) {
+    if (tokens?.accessToken) {
       headers["Authorization"] = `Bearer ${tokens.accessToken}`;
     }
 
